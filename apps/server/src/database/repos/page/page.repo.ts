@@ -125,6 +125,7 @@ export class PageRepo {
 
     this.eventEmitter.emit(EventName.PAGE_UPDATED, {
       pageIds: pageIds,
+      workspaceId: updatePageData.workspaceId,
     });
 
     return result;
@@ -143,6 +144,7 @@ export class PageRepo {
 
     this.eventEmitter.emit(EventName.PAGE_CREATED, {
       pageIds: [result.id],
+      workspaceId: result.workspaceId,
     });
 
     return result;
@@ -160,7 +162,11 @@ export class PageRepo {
     await query.execute();
   }
 
-  async removePage(pageId: string, deletedById: string): Promise<void> {
+  async removePage(
+    pageId: string,
+    deletedById: string,
+    workspaceId: string,
+  ): Promise<void> {
     const currentDate = new Date();
 
     const descendants = await this.db
@@ -195,13 +201,15 @@ export class PageRepo {
 
         await trx.deleteFrom('shares').where('pageId', 'in', pageIds).execute();
       });
+
       this.eventEmitter.emit(EventName.PAGE_SOFT_DELETED, {
         pageIds: pageIds,
+        workspaceId,
       });
     }
   }
 
-  async restorePage(pageId: string): Promise<void> {
+  async restorePage(pageId: string, workspaceId: string): Promise<void> {
     // First, check if the page being restored has a deleted parent
     const pageToRestore = await this.db
       .selectFrom('pages')
@@ -263,6 +271,7 @@ export class PageRepo {
     }
     this.eventEmitter.emit(EventName.PAGE_RESTORED, {
       pageIds: pageIds,
+      workspaceId: workspaceId,
     });
   }
 
@@ -284,24 +293,18 @@ export class PageRepo {
   }
 
   async getRecentPages(userId: string, pagination: PaginationOptions) {
-    const userSpaceIds = await this.spaceMemberRepo.getUserSpaceIds(userId);
-
     const query = this.db
       .selectFrom('pages')
       .select(this.baseFields)
       .select((eb) => this.withSpace(eb))
-      .where('spaceId', 'in', userSpaceIds)
+      .where('spaceId', 'in', this.spaceMemberRepo.getUserSpaceIdsQuery(userId))
       .where('deletedAt', 'is', null)
       .orderBy('updatedAt', 'desc');
 
-    const hasEmptyIds = userSpaceIds.length === 0;
-    const result = executeWithPagination(query, {
+    return executeWithPagination(query, {
       page: pagination.page,
       perPage: pagination.limit,
-      hasEmptyIds,
     });
-
-    return result;
   }
 
   async getDeletedPagesInSpace(spaceId: string, pagination: PaginationOptions) {
