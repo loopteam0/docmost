@@ -1,22 +1,23 @@
-import { Text, SimpleGrid, Card, rem, Group, Button } from "@mantine/core";
-import React from "react";
+import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
+import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
 import {
   prefetchSpace,
   useGetSpacesQuery,
 } from "@/features/space/queries/space-query.ts";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { Link } from "react-router-dom";
-import classes from "./space-grid.module.css";
+import useUserRole from "@/hooks/use-user-role";
 import { formatMemberCount } from "@/lib";
-import { useTranslation } from "react-i18next";
+import { getSpaceUrl } from "@/lib/config.ts";
+import { Button, Card, Group, rem, SimpleGrid, Text } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
-import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
-import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import CreateSpaceModal from "./create-space-modal";
+import classes from "./space-grid.module.css";
 
 export default function SpaceGrid() {
   const { t } = useTranslation();
   const { data, isLoading } = useGetSpacesQuery({ page: 1, limit: 10 });
-
+  const {isAdmin} = useUserRole();
   const cards = data?.items.slice(0, 9).map((space, index) => (
     <Card
       key={space.id}
@@ -55,6 +56,7 @@ export default function SpaceGrid() {
         <Text fz="sm" fw={500}>
           {t("Spaces you belong to")}
         </Text>
+        {isAdmin && ( <CreateSpaceModal />)}
       </Group>
 
       <SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>{cards}</SimpleGrid>

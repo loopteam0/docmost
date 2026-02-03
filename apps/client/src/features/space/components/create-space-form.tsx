@@ -1,13 +1,13 @@
-import { Group, Box, Button, TextInput, Stack, Textarea } from "@mantine/core";
-import React, { useEffect } from "react";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import * as z from "zod";
-import { useNavigate } from "react-router-dom";
 import { useCreateSpaceMutation } from "@/features/space/queries/space-query.ts";
 import { computeSpaceSlug } from "@/lib";
 import { getSpaceUrl } from "@/lib/config.ts";
+import { Box, Button, Group, Select, Stack, Textarea, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import * as z from "zod";
 
 const formSchema = z.object({
   name: z.string().trim().min(2).max(100),
@@ -21,6 +21,7 @@ const formSchema = z.object({
       "Space slug must be alphanumeric. No special characters",
     ),
   description: z.string().max(500),
+  templates: z.string().optional(),
 });
 type FormValues = z.infer<typeof formSchema>;
 
@@ -36,6 +37,7 @@ export function CreateSpaceForm() {
       name: "",
       slug: "",
       description: "",
+      templates: null,
     },
   });
 
@@ -58,11 +60,13 @@ export function CreateSpaceForm() {
     name?: string;
     slug?: string;
     description?: string;
+    templates?: string;
   }) => {
     const spaceData = {
       name: data.name,
       slug: data.slug,
       description: data.description,
+      templates: data.templates,
     };
 
     const createdSpace = await createSpaceMutation.mutateAsync(spaceData);
@@ -101,6 +105,15 @@ export function CreateSpaceForm() {
               minRows={2}
               maxRows={8}
               {...form.getInputProps("description")}
+            />
+
+            <Select
+              id="template"
+              label={t("Select Template")}
+              variant="filled"
+              placeholder={t("Pick a template")}
+              data={['React', 'Angular', 'Vue', 'Svelte']}
+                {...form.getInputProps("templates")}
             />
           </Stack>
 
