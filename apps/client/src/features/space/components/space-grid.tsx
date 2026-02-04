@@ -16,7 +16,7 @@ import classes from "./space-grid.module.css";
 
 export default function SpaceGrid() {
   const { t } = useTranslation();
-  const { data, isLoading } = useGetSpacesQuery({ page: 1, limit: 10 });
+  const { data, isLoading } = useGetSpacesQuery({ limit: 10 });
   const {isAdmin} = useUserRole();
   const cards = data?.items.slice(0, 9).map((space, index) => (
     <Card
