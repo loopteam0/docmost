@@ -15,7 +15,6 @@ export * from "./lib/markdown";
 export * from "./lib/math";
 export * from "./lib/media-utils";
 export * from "./lib/mention";
-export * from "./lib/recreate-transform";
 export * from "./lib/search-and-replace";
 export * from "./lib/selection";
 export * from "./lib/shared-storage";
