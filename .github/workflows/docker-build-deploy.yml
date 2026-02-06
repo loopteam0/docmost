@@ -1,0 +1,80 @@
+name: Build and Deploy to Azure Container Registry
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+  IMAGE_NAME: docmost
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Log in to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.AZURE_CLIENT_ID }}
+          password: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build with docker-compose
+        run: docker compose build docmost
+
+      - name: Tag and push Docker images
+        run: |
+          # Get the tags from metadata action
+          TAGS="${{ steps.meta.outputs.tags }}"
+          
+          # Tag and push each version
+          DIGEST=""
+          for tag in $TAGS; do
+            docker tag docmost/docmost:latest $tag
+            OUTPUT=$(docker push $tag 2>&1)
+            echo "Pushed: $tag"
+            # Capture digest from first push
+            if [ -z "$DIGEST" ]; then
+              DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
+            fi
+          done
+          
+          # Output the digest
+          if [ -n "$DIGEST" ]; then
+            echo "Image digest: $DIGEST"
+          fi
