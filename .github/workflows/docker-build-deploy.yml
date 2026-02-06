@@ -59,8 +59,18 @@ jobs:
 
       - name: Tag and push Docker images
         run: |
-          # Get the image ID built by docker compose
-          IMAGE_ID=$(docker compose images -q docmost)
+          # Get the image name built by docker compose
+          # Docker compose creates image with format: <project>-<service>
+          PROJECT_NAME=$(basename $(pwd))
+          SOURCE_IMAGE="${PROJECT_NAME}-docmost"
+          
+          # Verify the image exists
+          if ! docker image inspect "$SOURCE_IMAGE" > /dev/null 2>&1; then
+            echo "Error: Source image '$SOURCE_IMAGE' not found"
+            echo "Available images:"
+            docker images
+            exit 1
+          fi
           
           # Get the tags from metadata action
           TAGS="${{ steps.meta.outputs.tags }}"
@@ -68,8 +78,9 @@ jobs:
           # Tag and push each version
           DIGEST=""
           for tag in $TAGS; do
-            docker tag $IMAGE_ID $tag
-            OUTPUT=$(docker push $tag 2>&1)
+            echo "Tagging $SOURCE_IMAGE as $tag"
+            docker tag "$SOURCE_IMAGE" "$tag"
+            OUTPUT=$(docker push "$tag" 2>&1)
             echo "Pushed: $tag"
             # Capture digest from first push
             if [ -z "$DIGEST" ]; then
