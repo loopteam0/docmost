@@ -23,4 +23,6 @@ export * from "./lib/subpages";
 export * from "./lib/table";
 export * from "./lib/trailing-node";
 export * from "./lib/unique-id";
+export * from "./lib/utils";
+export * from "./lib/video";
 
