@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - dev
+      - master
     tags:
       - 'v*'
   workflow_dispatch:
@@ -59,13 +59,16 @@ jobs:
 
       - name: Tag and push Docker images
         run: |
+          # Get the image ID built by docker compose
+          IMAGE_ID=$(docker compose images -q docmost)
+          
           # Get the tags from metadata action
           TAGS="${{ steps.meta.outputs.tags }}"
           
           # Tag and push each version
           DIGEST=""
           for tag in $TAGS; do
-            docker tag docmost/docmost:latest $tag
+            docker tag $IMAGE_ID $tag
             OUTPUT=$(docker push $tag 2>&1)
             echo "Pushed: $tag"
             # Capture digest from first push
