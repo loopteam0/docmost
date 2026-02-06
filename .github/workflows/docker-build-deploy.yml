@@ -67,7 +67,7 @@ jobs:
 
           # Tag and push each version
           DIGEST=""
-          echo "$TAGS" | while IFS= read -r tag; do
+          while IFS= read -r tag; do
             if [ -n "$tag" ]; then
               docker tag "$IMAGE_ID" "$tag"
               OUTPUT=$(docker push "$tag" 2>&1)
@@ -78,4 +78,4 @@ jobs:
                 echo "Image digest: $DIGEST"
               fi
             fi
-          done
+          done < <(echo "$TAGS")
