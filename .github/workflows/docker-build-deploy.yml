@@ -57,6 +57,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # Building for linux/amd64 only for faster builds
+          # Add linux/arm64 to platforms if multi-arch support is needed
           platforms: linux/amd64
 
       - name: Image digest
