@@ -65,7 +65,7 @@ jobs:
           # Tag and push each version
           DIGEST=""
           for tag in $TAGS; do
-            docker tag docmost/docmost:latest $tag
+            docker tag docmost-docmost $tag
             OUTPUT=$(docker push $tag 2>&1)
             echo "Pushed: $tag"
             # Capture digest from first push
