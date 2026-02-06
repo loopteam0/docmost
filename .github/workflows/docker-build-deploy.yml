@@ -23,6 +23,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
       - name: Log in to Azure Container Registry
         uses: docker/login-action@v3
         with:
@@ -44,7 +55,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build with docker-compose
-        run: docker-compose build docmost
+        run: docker compose build docmost
 
       - name: Tag and push Docker images
         run: |
@@ -52,12 +63,18 @@ jobs:
           TAGS="${{ steps.meta.outputs.tags }}"
           
           # Tag and push each version
+          DIGEST=""
           for tag in $TAGS; do
             docker tag docmost/docmost:latest $tag
-            docker push $tag
+            OUTPUT=$(docker push $tag 2>&1)
             echo "Pushed: $tag"
+            # Capture digest from first push
+            if [ -z "$DIGEST" ]; then
+              DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
+            fi
           done
-
-      - name: Get image digest
-        run: |
-          docker images --digests docmost/docmost:latest | grep latest | awk '{print "Digest: " $3}'
+          
+          # Output the digest
+          if [ -n "$DIGEST" ]; then
+            echo "Image digest: $DIGEST"
+          fi
