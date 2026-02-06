@@ -61,7 +61,7 @@ jobs:
         run: |
           # Get the image name built by docker compose
           # Docker compose creates image with format: <project>-<service>
-          PROJECT_NAME=$(basename $(pwd))
+          PROJECT_NAME="${{ github.event.repository.name }}"
           SOURCE_IMAGE="${PROJECT_NAME}-docmost"
           
           # Verify the image exists
