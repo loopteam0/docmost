@@ -1,4 +1,4 @@
-import { IAttachment } from "@/features/attachment/types/attachment.types";
+import { IAttachment } from "@/features/attachments/types/attachment.types";
 import { UploadConfig } from "@/features/editor/plugins/types";
 
 /**

@@ -1,7 +1,6 @@
-import { Editor, Extension } from "@tiptap/react";
-import { HocuspocusProvider } from "@hocuspocus/provider";
+import { IAttachment } from "@/features/attachments/types/attachment.types";
 import { IUser } from "@/features/user/types/user.types";
-import { IAttachment } from "@/features/attachment/types/attachment.types";
+import { Editor, Extension } from "@tiptap/react";
 import { RefObject } from "react";
 
 /**
