@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,23 +61,21 @@ jobs:
         run: |
           # Get the image ID built by docker compose
           IMAGE_ID=$(docker compose images -q docmost)
-          
-          # Get the tags from metadata action
+
+          # Get the tags from metadata action (newline-delimited)
           TAGS="${{ steps.meta.outputs.tags }}"
-          
+
           # Tag and push each version
           DIGEST=""
-          for tag in $TAGS; do
-            docker tag $IMAGE_ID $tag
-            OUTPUT=$(docker push $tag 2>&1)
-            echo "Pushed: $tag"
-            # Capture digest from first push
-            if [ -z "$DIGEST" ]; then
-              DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
+          echo "$TAGS" | while IFS= read -r tag; do
+            if [ -n "$tag" ]; then
+              docker tag "$IMAGE_ID" "$tag"
+              OUTPUT=$(docker push "$tag" 2>&1)
+              echo "Pushed: $tag"
+              # Capture digest from first push
+              if [ -z "$DIGEST" ]; then
+                DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
+                echo "Image digest: $DIGEST"
+              fi
             fi
           done
-          
-          # Output the digest
-          if [ -n "$DIGEST" ]; then
-            echo "Image digest: $DIGEST"
-          fi
