@@ -72,12 +72,25 @@ jobs:
             exit 1
           fi
           
-          # Get the tags from metadata action
+          # Get the tags from metadata action (multiline string)
           TAGS="${{ steps.meta.outputs.tags }}"
+          
+          # Validate we have tags
+          if [ -z "$TAGS" ]; then
+            echo "Error: No tags generated from metadata action"
+            exit 1
+          fi
+          
+          echo "Generated tags:"
+          echo "$TAGS"
+          echo ""
           
           # Tag and push each version
           DIGEST=""
-          for tag in $TAGS; do
+          while IFS= read -r tag; do
+            # Skip empty lines
+            [ -z "$tag" ] && continue
+            
             echo "Tagging $SOURCE_IMAGE as $tag"
             docker tag "$SOURCE_IMAGE" "$tag"
             OUTPUT=$(docker push "$tag" 2>&1)
@@ -86,7 +99,7 @@ jobs:
             if [ -z "$DIGEST" ]; then
               DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
             fi
-          done
+          done <<< "$TAGS"
           
           # Output the digest
           if [ -n "$DIGEST" ]; then
