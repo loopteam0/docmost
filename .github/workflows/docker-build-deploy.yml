@@ -2,8 +2,8 @@ name: Build and Deploy to Azure Container Registry
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'dev'
   workflow_dispatch:
 
 env:
@@ -38,18 +38,6 @@ jobs:
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=raw,value=latest,enable={{is_default_branch}}
-
       - name: Build with docker-compose
         run: docker compose build docmost
 
@@ -58,20 +46,10 @@ jobs:
           # Get the image ID built by docker compose
           IMAGE_ID=$(docker compose images -q docmost)
 
-          # Get the tags from metadata action (newline-delimited)
-          TAGS="${{ steps.meta.outputs.tags }}"
+          # Construct the target tag using the registry environment variables
+          TARGET_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
 
-          # Tag and push each version
-          DIGEST=""
-          while IFS= read -r tag; do
-            if [ -n "$tag" ]; then
-              docker tag "$IMAGE_ID" "$tag"
-              OUTPUT=$(docker push "$tag" 2>&1)
-              echo "Pushed: $tag"
-              # Capture digest from first push
-              if [ -z "$DIGEST" ]; then
-                DIGEST=$(echo "$OUTPUT" | grep -oP 'digest: \K[^ ]+' || echo "")
-                echo "Image digest: $DIGEST"
-              fi
-            fi
-          done < <(echo "$TAGS")
+          # Tag and push
+          docker tag "$IMAGE_ID" "$TARGET_TAG"
+          docker push "$TARGET_TAG"
+          echo "Pushed: $TARGET_TAG"
