@@ -7,8 +7,7 @@ This document describes the GitHub Action workflow for building and deploying Do
 The workflow (`.github/workflows/docker-build-deploy.yml`) uses **docker-compose** to build the Docmost application image and pushes it to Azure Container Registry.
 
 The workflow is triggered on:
-- Push to `main` or `master` branches
-- Push of version tags (e.g., `v1.0.0`)
+- Push of version tags (e.g., `v1.0.0`, `v2.1.3`)
 - Manual workflow dispatch
 
 ## Required GitHub Secrets
@@ -72,11 +71,11 @@ This can be:
 
 ## Docker Image Tags
 
-The workflow uses docker-compose to build the application image and automatically creates the following tags in Azure Container Registry:
-- `latest` - Latest build from the default branch
-- `{branch-name}` - Branch-specific builds
-- `{version}` - Semantic version tags (e.g., `1.0.0`, `1.0`, `1`)
-- `{branch}-{sha}` - Commit-specific tags
+The workflow uses docker-compose to build the application image and automatically creates the following tags in Azure Container Registry based on the version tag:
+- `{version}` - Semantic version tags (e.g., `1.0.0` from tag `v1.0.0`)
+- `{major}.{minor}` - Major and minor version (e.g., `1.0` from tag `v1.0.0`)
+- `{major}` - Major version (e.g., `1` from tag `v1.0.0`)
+- `latest` - If pushing from the default branch tag
 
 Note: The docker-compose.yml has been configured with a build section to build from the Dockerfile.
 

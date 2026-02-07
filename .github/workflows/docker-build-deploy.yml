@@ -2,9 +2,6 @@ name: Build and Deploy to Azure Container Registry
 
 on:
   push:
-    branches:
-      - main
-      - dev
     tags:
       - 'v*'
   workflow_dispatch:
