@@ -82,7 +82,7 @@ jobs:
           fi
           
           echo "Generated tags:"
-          echo "$TAGS"
+          printf '%s\n' "$TAGS"
           echo ""
           
           # Tag and push each version
