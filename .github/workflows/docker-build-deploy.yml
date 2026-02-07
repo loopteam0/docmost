@@ -38,18 +38,21 @@ jobs:
           username: ${{ secrets.AZURE_CLIENT_ID }}
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Build with docker-compose
-        run: docker compose build docmost
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Tag and push Docker images
+      - name: Build and push Docker image
         run: |
-          # Get the image ID built by docker compose
-          IMAGE_ID=$(docker compose images -q docmost)
+          # Allow .env file to be copied into the image (overriding .dockerignore)
+          echo "!.env" >> .dockerignore
 
-          # Construct the target tag using the registry environment variables
+          # Construct the target tag
           TARGET_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-
-          # Tag and push
-          docker tag "$IMAGE_ID" "$TARGET_TAG"
+          
+          # Build directly using docker build
+          # The .env file created in the previous step is now included via 'COPY . .'
+          docker build -t "$TARGET_TAG" .
+          
+          # Push
           docker push "$TARGET_TAG"
           echo "Pushed: $TARGET_TAG"
