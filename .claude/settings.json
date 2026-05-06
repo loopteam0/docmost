@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/paulboamah/Documents/work_space/guest/docmost ls-files apps/client/dist)",
+      "Bash(git -C /Users/paulboamah/Documents/work_space/guest/docmost log --oneline -5)",
+      "Bash(git -C /Users/paulboamah/Documents/work_space/guest/docmost diff HEAD~1 --name-only)"
+    ]
+  }
+}

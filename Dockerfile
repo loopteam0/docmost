@@ -12,6 +12,9 @@ COPY . .
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
+# Verify client was actually built
+RUN test -f /app/apps/client/dist/index.html || (echo "ERROR: Client build output missing" && exit 1)
+
 FROM base AS installer
 
 RUN apt-get update \

@@ -39,20 +39,22 @@ jobs:
           password: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Create .env file
-        run: echo "${{ secrets.ENV_FILE }}" > .env
-
-      - name: Build and push Docker image
         run: |
-          # Allow .env file to be copied into the image (overriding .dockerignore)
+          echo "${{ secrets.ENV_FILE }}" > .env
           echo "!.env" >> .dockerignore
 
-          # Construct the target tag
-          TARGET_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
-          
-          # Build directly using docker build
-          # The .env file created in the previous step is now included via 'COPY . .'
-          docker build -t "$TARGET_TAG" .
-          
-          # Push
-          docker push "$TARGET_TAG"
-          echo "Pushed: $TARGET_TAG"
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
+
+      - name: Move cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
