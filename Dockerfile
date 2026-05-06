@@ -43,7 +43,7 @@ COPY --from=builder /app/patches /app/patches
 RUN chown -R node:node /app
 
 USER node
-
+RUN chmod -R 777 /app/apps/client/dist
 RUN pnpm install --frozen-lockfile --prod
 
 RUN mkdir -p /app/data/storage
