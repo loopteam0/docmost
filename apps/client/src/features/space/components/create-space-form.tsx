@@ -1,15 +1,33 @@
-import { useCreateSpaceMutation } from "@/features/space/queries/space-query.ts";
+import {
+  useCreateSpaceMutation,
+  useSpaceTemplatesQuery,
+} from "@/features/space/queries/space-query.ts";
 import { computeSpaceSlug } from "@/lib";
-import { getSpaceUrl } from "@/lib/config.ts";
-import { Box, Button, Group, Select, Stack, Textarea, TextInput } from "@mantine/core";
+import { buildPageUrl } from "@/features/page/page.utils.ts";
+import {
+  Badge,
+  Box,
+  Button,
+  Group,
+  Loader,
+  SimpleGrid,
+  Stack,
+  Stepper,
+  Text,
+  Textarea,
+  TextInput,
+  UnstyledButton,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import * as z from "zod";
+import classes from "./create-space-form.module.css";
+import { ISpaceTemplate } from "@/features/space/types/space.types.ts";
 
-const formSchema = z.object({
+const step1Schema = z.object({
   name: z.string().trim().min(2).max(100),
   slug: z
     .string()
@@ -21,14 +39,66 @@ const formSchema = z.object({
       "Space slug must be alphanumeric. No special characters",
     ),
   description: z.string().max(500),
-  templates: z.string().optional(),
 });
+
+const formSchema = step1Schema.extend({
+  templateId: z.string().nullable().optional(),
+});
+
 type FormValues = z.infer<typeof formSchema>;
 
-export function CreateSpaceForm() {
+interface Props {
+  onClose?: () => void;
+}
+
+function TemplateCard({
+  tpl,
+  isSelected,
+  onToggle,
+}: {
+  tpl: ISpaceTemplate;
+  isSelected: boolean;
+  onToggle: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <UnstyledButton
+      className={`${classes.templateCard} ${isSelected ? classes.templateCardSelected : ""}`}
+      onClick={onToggle}
+    >
+      <Text size="xl" mb={4}>
+        {tpl.icon}
+      </Text>
+      <Group gap={4} align="center" wrap="nowrap">
+        <Text size="sm" fw={600} lh={1.2} style={{ flexShrink: 0 }}>
+          {t(tpl.name)}
+        </Text>
+        {!tpl.isSystem && (
+          <Badge size="xs" variant="light" color="violet">
+            {t("Custom")}
+          </Badge>
+        )}
+      </Group>
+      <Text size="xs" c="dimmed" mt={2} lh={1.3}>
+        {tpl.description}
+      </Text>
+      {isSelected && tpl.pages && tpl.pages.length > 0 && (
+        <Text size="xs" c="dimmed" mt={6}>
+          {tpl.pages.slice(0, 3).join(" · ")}
+          {tpl.pages.length > 3 ? ` +${tpl.pages.length - 3}` : ""}
+        </Text>
+      )}
+    </UnstyledButton>
+  );
+}
+
+export function CreateSpaceForm({ onClose }: Props) {
   const { t } = useTranslation();
   const createSpaceMutation = useCreateSpaceMutation();
   const navigate = useNavigate();
+  const [step, setStep] = useState(0);
+  const { data: templates, isLoading: templatesLoading } =
+    useSpaceTemplatesQuery();
 
   const form = useForm<FormValues>({
     validate: zodResolver(formSchema),
@@ -37,50 +107,61 @@ export function CreateSpaceForm() {
       name: "",
       slug: "",
       description: "",
-      templates: null,
+      templateId: null,
     },
   });
 
   useEffect(() => {
     const name = form.values.name;
     const words = name.trim().split(/\s+/);
-
-    // Check if the last character is a space or if the last word is a single character (indicating it's in progress)
     const lastChar = name[name.length - 1];
     const lastWordIsIncomplete =
       words.length > 1 && words[words.length - 1].length === 1;
 
     if (lastChar !== " " || lastWordIsIncomplete) {
-      const slug = computeSpaceSlug(name);
-      form.setFieldValue("slug", slug);
+      form.setFieldValue("slug", computeSpaceSlug(name));
     }
   }, [form.values.name]);
 
-  const handleSubmit = async (data: {
-    name?: string;
-    slug?: string;
-    description?: string;
-    templates?: string;
-  }) => {
-    const spaceData = {
+  const handleNext = () => {
+    const result = form.validate();
+    const step1Fields = ["name", "slug", "description"] as const;
+    const hasStep1Errors = step1Fields.some((f) => result.errors[f]);
+    if (!hasStep1Errors) setStep(1);
+  };
+
+  const handleSubmit = async (data: FormValues) => {
+    const createdSpace = await createSpaceMutation.mutateAsync({
       name: data.name,
       slug: data.slug,
       description: data.description,
-      templates: data.templates,
-    };
+      templateId: data.templateId ?? undefined,
+    });
 
-    const createdSpace = await createSpaceMutation.mutateAsync(spaceData);
-    navigate(getSpaceUrl(createdSpace.slug));
+    onClose?.();
+
+    if (createdSpace.initialPageSlugId) {
+      navigate(buildPageUrl(createdSpace.slug, createdSpace.initialPageSlugId));
+    } else {
+      navigate("/s/" + createdSpace.slug);
+    }
   };
 
+  const selectedId = form.values.templateId;
+
   return (
-    <>
-      <Box maw="500" mx="auto">
-        <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-          <Stack>
+    <Box>
+      <Stepper active={step} mb="lg" size="sm">
+        <Stepper.Step label={t("Details")} />
+        <Stepper.Step label={t("Template")} />
+      </Stepper>
+
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        {step === 0 && (
+          <Stack gap="md">
             <TextInput
               withAsterisk
-              id="name"
+              autoFocus
               label={t("Space name")}
               placeholder={t("e.g Product Team")}
               variant="filled"
@@ -89,7 +170,6 @@ export function CreateSpaceForm() {
 
             <TextInput
               withAsterisk
-              id="slug"
               label={t("Space slug")}
               placeholder={t("e.g product")}
               variant="filled"
@@ -97,31 +177,64 @@ export function CreateSpaceForm() {
             />
 
             <Textarea
-              id="description"
               label={t("Space description")}
               placeholder={t("e.g Space for product team")}
               variant="filled"
               autosize
               minRows={2}
-              maxRows={8}
+              maxRows={6}
               {...form.getInputProps("description")}
             />
 
-            <Select
-              id="template"
-              label={t("Select Template")}
-              variant="filled"
-              placeholder={t("Pick a template")}
-              data={['React', 'Angular', 'Vue', 'Svelte']}
-                {...form.getInputProps("templates")}
-            />
+            <Group justify="flex-end" mt="xs">
+              <Button onClick={handleNext}>{t("Next")}</Button>
+            </Group>
           </Stack>
+        )}
 
-          <Group justify="flex-end" mt="md">
-            <Button type="submit">{t("Create")}</Button>
-          </Group>
-        </form>
-      </Box>
-    </>
+        {step === 1 && (
+          <Stack gap="md">
+            <div>
+              <Text size="sm" c="dimmed" mb="sm">
+                {t(
+                  "Pick a template to pre-fill your space with relevant starter pages, or skip to start blank.",
+                )}
+              </Text>
+
+              {templatesLoading ? (
+                <Group justify="center" py="xl">
+                  <Loader size="sm" />
+                </Group>
+              ) : (
+                <SimpleGrid cols={3} spacing="xs">
+                  {(templates ?? []).map((tpl) => (
+                    <TemplateCard
+                      key={tpl.id}
+                      tpl={tpl}
+                      isSelected={selectedId === tpl.id}
+                      onToggle={() =>
+                        form.setFieldValue(
+                          "templateId",
+                          selectedId === tpl.id ? null : tpl.id,
+                        )
+                      }
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+            </div>
+
+            <Group justify="space-between" mt="xs">
+              <Button variant="subtle" onClick={() => setStep(0)}>
+                {t("Back")}
+              </Button>
+              <Button type="submit" loading={createSpaceMutation.isPending}>
+                {selectedId ? t("Create with template") : t("Create blank")}
+              </Button>
+            </Group>
+          </Stack>
+        )}
+      </form>
+    </Box>
   );
 }

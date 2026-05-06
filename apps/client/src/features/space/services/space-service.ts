@@ -2,10 +2,12 @@ import api from "@/lib/api-client";
 import {
   IAddSpaceMember,
   IChangeSpaceMemberRole,
+  ICreateSpaceTemplateParams,
   IExportSpaceParams,
   IRemoveSpaceMember,
   ISpace,
   ISpaceMember,
+  ISpaceTemplate,
 } from "@/features/space/types/space.types";
 import { IPagination, QueryParams } from "@/lib/types.ts";
 import { saveAs } from "file-saver";
@@ -22,7 +24,9 @@ export async function getSpaceById(spaceId: string): Promise<ISpace> {
   return req.data;
 }
 
-export async function createSpace(data: Partial<ISpace>): Promise<ISpace> {
+export async function createSpace(
+  data: Partial<ISpace> & { templateId?: string },
+): Promise<ISpace> {
   const req = await api.post<ISpace>("/spaces/create", data);
   return req.data;
 }
@@ -58,6 +62,22 @@ export async function changeMemberRole(
   data: IChangeSpaceMemberRole,
 ): Promise<void> {
   await api.post("/spaces/members/change-role", data);
+}
+
+export async function listSpaceTemplates(): Promise<ISpaceTemplate[]> {
+  const req = await api.post<ISpaceTemplate[]>("/space-templates");
+  return req.data;
+}
+
+export async function createSpaceTemplate(
+  data: ICreateSpaceTemplateParams,
+): Promise<ISpaceTemplate> {
+  const req = await api.post<ISpaceTemplate>("/space-templates/create", data);
+  return req.data;
+}
+
+export async function deleteSpaceTemplate(templateId: string): Promise<void> {
+  await api.post("/space-templates/delete", { templateId });
 }
 
 export async function exportSpace(data: IExportSpaceParams): Promise<void> {

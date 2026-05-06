@@ -291,6 +291,29 @@ export interface UserMfa {
   workspaceId: string;
 }
 
+// Manually added — pending `pnpm migration:codegen` after running the space-templates migration.
+export interface SpaceTemplates {
+  createdAt: Generated<Timestamp>;
+  creatorId: string | null;
+  description: string | null;
+  icon: string | null;
+  id: Generated<string>;
+  name: string;
+  updatedAt: Generated<Timestamp>;
+  workspaceId: string;
+}
+
+export interface SpaceTemplatePages {
+  content: Json | null;
+  createdAt: Generated<Timestamp>;
+  icon: string | null;
+  id: Generated<string>;
+  parentPageId: string | null;
+  position: string | null;
+  templateId: string;
+  title: string | null;
+}
+
 export interface Users {
   avatarUrl: string | null;
   createdAt: Generated<Timestamp>;
@@ -376,6 +399,8 @@ export interface DB {
   shares: Shares;
   spaceMembers: SpaceMembers;
   spaces: Spaces;
+  spaceTemplates: SpaceTemplates;
+  spaceTemplatePages: SpaceTemplatePages;
   userMfa: UserMfa;
   users: Users;
   userTokens: UserTokens;

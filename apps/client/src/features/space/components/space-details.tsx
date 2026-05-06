@@ -3,6 +3,7 @@ import { useSpaceQuery } from "@/features/space/queries/space-query.ts";
 import { EditSpaceForm } from "@/features/space/components/edit-space-form.tsx";
 import { Button, Divider, Text } from "@mantine/core";
 import DeleteSpaceModal from "./delete-space-modal";
+import SaveAsTemplateModal from "./save-as-template-modal";
 import { useDisclosure } from "@mantine/hooks";
 import ExportModal from "@/components/common/export-modal.tsx";
 import AvatarUploader from "@/components/common/avatar-uploader.tsx";
@@ -28,6 +29,10 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
   const { data: space, isLoading, refetch } = useSpaceQuery(spaceId);
   const [exportOpened, { open: openExportModal, close: closeExportModal }] =
     useDisclosure(false);
+  const [
+    saveTemplateOpened,
+    { open: openSaveTemplate, close: closeSaveTemplate },
+  ] = useDisclosure(false);
   const [isIconUploading, setIsIconUploading] = useState(false);
 
   const handleIconUpload = async (file: File) => {
@@ -108,6 +113,24 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
 
               <ResponsiveSettingsRow>
                 <ResponsiveSettingsContent>
+                  <Text size="md">{t("Save as template")}</Text>
+                  <Text size="sm" c="dimmed">
+                    {t(
+                      "Save this space's pages as a reusable template for your workspace.",
+                    )}
+                  </Text>
+                </ResponsiveSettingsContent>
+                <ResponsiveSettingsControl>
+                  <Button variant="default" onClick={openSaveTemplate}>
+                    {t("Save as template")}
+                  </Button>
+                </ResponsiveSettingsControl>
+              </ResponsiveSettingsRow>
+
+              <Divider my="lg" />
+
+              <ResponsiveSettingsRow>
+                <ResponsiveSettingsContent>
                   <Text size="md">{t("Delete space")}</Text>
                   <Text size="sm" c="dimmed">
                     {t("Delete this space with all its pages and data.")}
@@ -123,6 +146,12 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
                 id={space.id}
                 open={exportOpened}
                 onClose={closeExportModal}
+              />
+
+              <SaveAsTemplateModal
+                space={space}
+                opened={saveTemplateOpened}
+                onClose={closeSaveTemplate}
               />
             </>
           )}

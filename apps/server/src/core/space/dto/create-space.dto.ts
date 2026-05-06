@@ -22,4 +22,8 @@ export class CreateSpaceDto {
   @MaxLength(100)
   @IsAlphanumeric()
   slug: string;
+
+  @IsOptional()
+  @IsString()
+  templateId?: string;
 }

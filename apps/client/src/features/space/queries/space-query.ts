@@ -8,9 +8,11 @@ import {
 import {
   IAddSpaceMember,
   IChangeSpaceMemberRole,
+  ICreateSpaceTemplateParams,
   IRemoveSpaceMember,
   ISpace,
   ISpaceMember,
+  ISpaceTemplate,
 } from "@/features/space/types/space.types";
 import {
   addSpaceMember,
@@ -22,6 +24,9 @@ import {
   createSpace,
   updateSpace,
   deleteSpace,
+  listSpaceTemplates,
+  createSpaceTemplate,
+  deleteSpaceTemplate,
 } from "@/features/space/services/space-service.ts";
 import { notifications } from "@mantine/notifications";
 import { IPagination, QueryParams } from "@/lib/types.ts";
@@ -80,7 +85,7 @@ export function useCreateSpaceMutation() {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
-  return useMutation<ISpace, Error, Partial<ISpace>>({
+  return useMutation<ISpace, Error, Partial<ISpace> & { templateId?: string }>({
     mutationFn: (data) => createSpace(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -252,6 +257,51 @@ export function useChangeSpaceMemberRoleMutation() {
       queryClient.refetchQueries({
         queryKey: ["spaceMembers", variables.spaceId],
       });
+    },
+    onError: (error) => {
+      const errorMessage = error["response"]?.data?.message;
+      notifications.show({ message: errorMessage, color: "red" });
+    },
+  });
+}
+
+export function useSpaceTemplatesQuery(): UseQueryResult<
+  ISpaceTemplate[],
+  Error
+> {
+  return useQuery({
+    queryKey: ["space-templates"],
+    queryFn: listSpaceTemplates,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useCreateSpaceTemplateMutation() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation<ISpaceTemplate, Error, ICreateSpaceTemplateParams>({
+    mutationFn: createSpaceTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["space-templates"] });
+      notifications.show({ message: t("Template saved successfully") });
+    },
+    onError: (error) => {
+      const errorMessage = error["response"]?.data?.message;
+      notifications.show({ message: errorMessage, color: "red" });
+    },
+  });
+}
+
+export function useDeleteSpaceTemplateMutation() {
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+
+  return useMutation<void, Error, string>({
+    mutationFn: deleteSpaceTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["space-templates"] });
+      notifications.show({ message: t("Template deleted") });
     },
     onError: (error) => {
       const errorMessage = error["response"]?.data?.message;

@@ -17,12 +17,14 @@ import { QueueJob, QueueName } from 'src/integrations/queue/constants';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
+import { SpaceTemplateService } from './space-template.service';
 
 @Injectable()
 export class SpaceService {
   constructor(
     private spaceRepo: SpaceRepo,
     private spaceMemberService: SpaceMemberService,
+    private spaceTemplateService: SpaceTemplateService,
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
   ) {}
@@ -32,8 +34,9 @@ export class SpaceService {
     workspaceId: string,
     createSpaceDto: CreateSpaceDto,
     trx?: KyselyTransaction,
-  ): Promise<Space> {
+  ): Promise<Space & { initialPageSlugId?: string }> {
     let space = null;
+    let initialPageSlugId: string | null = null;
 
     await executeTx(
       this.db,
@@ -52,11 +55,21 @@ export class SpaceService {
           workspaceId,
           trx,
         );
+
+        if (createSpaceDto.templateId) {
+          initialPageSlugId = await this.spaceTemplateService.applyTemplate(
+            space.id,
+            createSpaceDto.templateId,
+            authUser.id,
+            workspaceId,
+            trx,
+          );
+        }
       },
       trx,
     );
 
-    return { ...space, memberCount: 1 };
+    return { ...space, memberCount: 1, initialPageSlugId };
   }
 
   async create(

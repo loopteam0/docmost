@@ -11,9 +11,14 @@ export default function CreateSpaceModal() {
     <>
       <Button onClick={open}>{t("Create space")}</Button>
 
-      <Modal opened={opened} onClose={close} title={t("Create space")}>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title={t("Create space")}
+        size="lg"
+      >
         <Divider size="xs" mb="xs" />
-        <CreateSpaceForm />
+        <CreateSpaceForm onClose={close} />
       </Modal>
     </>
   );

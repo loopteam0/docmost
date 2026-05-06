@@ -18,6 +18,7 @@ export interface ISpace {
   memberCount?: number;
   spaceId?: string;
   membership?: IMembership;
+  initialPageSlugId?: string;
 }
 
 interface IMembership {
@@ -74,4 +75,21 @@ export interface IExportSpaceParams {
   spaceId: string;
   format: ExportFormat;
   includeAttachments?: boolean;
+}
+
+export interface ISpaceTemplate {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  isSystem: boolean;
+  creatorId?: string;
+  pages?: string[];
+}
+
+export interface ICreateSpaceTemplateParams {
+  name: string;
+  description?: string;
+  icon?: string;
+  spaceId: string;
 }

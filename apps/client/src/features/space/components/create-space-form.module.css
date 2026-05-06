@@ -1,0 +1,21 @@
+.templateCard {
+  padding: var(--mantine-spacing-sm);
+  border-radius: var(--mantine-radius-md);
+  border: 1px solid var(--mantine-color-default-border);
+  background: var(--mantine-color-body);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+  text-align: left;
+  width: 100%;
+}
+
+.templateCard:hover {
+  border-color: var(--mantine-color-blue-5);
+  background: var(--mantine-color-blue-light);
+}
+
+.templateCardSelected {
+  border-color: var(--mantine-color-blue-6);
+  background: var(--mantine-color-blue-light);
+  box-shadow: 0 0 0 1px var(--mantine-color-blue-6);
+}

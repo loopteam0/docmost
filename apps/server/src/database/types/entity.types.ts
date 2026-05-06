@@ -20,6 +20,8 @@ import {
   FileTasks,
   UserMfa as _UserMFA,
   ApiKeys,
+  SpaceTemplates,
+  SpaceTemplatePages,
 } from './db';
 import { PageEmbeddings } from '@docmost/db/types/embeddings.types';
 
@@ -126,6 +128,15 @@ export type UpdatableUserMFA = Updateable<Omit<_UserMFA, 'id'>>;
 export type ApiKey = Selectable<ApiKeys>;
 export type InsertableApiKey = Insertable<ApiKeys>;
 export type UpdatableApiKey = Updateable<Omit<ApiKeys, 'id'>>;
+
+// Space Template
+export type SpaceTemplate = Selectable<SpaceTemplates>;
+export type InsertableSpaceTemplate = Insertable<SpaceTemplates>;
+export type UpdatableSpaceTemplate = Updateable<Omit<SpaceTemplates, 'id'>>;
+
+// Space Template Page
+export type SpaceTemplatePage = Selectable<SpaceTemplatePages>;
+export type InsertableSpaceTemplatePage = Insertable<SpaceTemplatePages>;
 
 // Page Embedding
 export type PageEmbedding = Selectable<PageEmbeddings>;

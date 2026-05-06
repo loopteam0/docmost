@@ -14,6 +14,8 @@ import {
   Shares,
   SpaceMembers,
   Spaces,
+  SpaceTemplates,
+  SpaceTemplatePages,
   UserMfa,
   Users,
   UserTokens,
@@ -38,6 +40,8 @@ export interface DbInterface {
   shares: Shares;
   spaceMembers: SpaceMembers;
   spaces: Spaces;
+  spaceTemplates: SpaceTemplates;
+  spaceTemplatePages: SpaceTemplatePages;
   userMfa: UserMfa;
   users: Users;
   userTokens: UserTokens;
