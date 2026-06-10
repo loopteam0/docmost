@@ -150,6 +150,27 @@ export class PageRepo {
     return result;
   }
 
+  async findByTitleAndSpace(
+    title: string,
+    spaceId: string,
+    parentPageId?: string | null,
+  ): Promise<Page | undefined> {
+    let query = this.db
+      .selectFrom('pages')
+      .select(this.baseFields)
+      .where('title', '=', title)
+      .where('spaceId', '=', spaceId)
+      .where('deletedAt', 'is', null);
+
+    if (parentPageId) {
+      query = query.where('parentPageId', '=', parentPageId);
+    } else {
+      query = query.where('parentPageId', 'is', null);
+    }
+
+    return query.executeTakeFirst();
+  }
+
   async deletePage(pageId: string): Promise<void> {
     let query = this.db.deleteFrom('pages');
 

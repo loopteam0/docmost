@@ -112,6 +112,25 @@ export class TokenService {
     return this.jwtService.sign(payload, expiresIn ? { expiresIn } : {});
   }
 
+  async generateProvisionToken(
+    user: User,
+    workspaceId: string,
+    expiresIn: string | number = '1y',
+  ): Promise<string> {
+    if (user.deactivatedAt || user.deletedAt) {
+      throw new ForbiddenException();
+    }
+
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      workspaceId,
+      type: JwtType.ACCESS,
+    };
+
+    return this.jwtService.sign(payload, { expiresIn });
+  }
+
   async verifyJwt(token: string, tokenType: string) {
     const payload = await this.jwtService.verifyAsync(token, {
       secret: this.environmentService.getAppSecret(),
