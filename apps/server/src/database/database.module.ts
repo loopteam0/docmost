@@ -15,6 +15,7 @@ import { PageTransclusionsRepo } from './repos/page-transclusions/page-transclus
 import { PageTransclusionReferencesRepo } from './repos/page-transclusions/page-transclusion-references.repo';
 import { PageHistoryRepo } from './repos/page/page-history.repo';
 import { AttachmentRepo } from './repos/attachment/attachment.repo';
+import { FavoriteRepo } from './repos/favorite/favorite.repo';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import * as process from 'node:process';
 import { MigrationService } from '@docmost/db/services/migration.service';

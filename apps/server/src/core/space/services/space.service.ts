@@ -21,6 +21,12 @@ import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { CursorPaginationResult } from '@docmost/db/pagination/cursor-pagination';
 import { SpaceTemplateService } from './space-template.service';
+import { AUDIT_SERVICE, IAuditService } from '../../../integrations/audit/audit.service';
+import { AuditEvent, AuditResource } from '../../../common/events/audit-events';
+import { diffAuditTrackedFields } from '../../../common/helpers/utils';
+import { WorkspaceRepo } from '@docmost/db/repos/workspace/workspace.repo';
+import { ShareRepo } from '@docmost/db/repos/share/share.repo';
+import { LicenseCheckService } from '../../../integrations/environment/license-check.service';
 
 @Injectable()
 export class SpaceService {
@@ -28,6 +34,9 @@ export class SpaceService {
     private spaceRepo: SpaceRepo,
     private spaceMemberService: SpaceMemberService,
     private spaceTemplateService: SpaceTemplateService,
+    private workspaceRepo: WorkspaceRepo,
+    private shareRepo: ShareRepo,
+    private licenseCheckService: LicenseCheckService,
     @InjectKysely() private readonly db: KyselyDB,
     @InjectQueue(QueueName.ATTACHMENT_QUEUE) private attachmentQueue: Queue,
     @Inject(AUDIT_SERVICE) private readonly auditService: IAuditService,

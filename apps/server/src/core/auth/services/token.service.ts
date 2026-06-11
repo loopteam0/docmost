@@ -133,7 +133,7 @@ export class TokenService {
       type: JwtType.ACCESS,
     };
 
-    return this.jwtService.sign(payload, { expiresIn });
+    return this.jwtService.sign(payload, { expiresIn: expiresIn as StringValue });
   }
 
   async verifyJwt(token: string, tokenType: string) {

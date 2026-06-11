@@ -19,6 +19,7 @@ import { DomainMiddleware } from '../common/middlewares/domain.middleware';
 import { AuditContextMiddleware } from '../common/middlewares/audit-context.middleware';
 import { ShareModule } from './share/share.module';
 import { ProvisionModule } from './provision/provision.module';
+import { FavoriteModule } from './favorite/favorite.module';
 
 @Module({
   imports: [

@@ -63,7 +63,7 @@ export default function App() {
           <>
             <Route path={"/create"} element={<CreateWorkspace />} />
             <Route path={"/select"} element={<CloudLogin />} />
-            <Route path={"/verify-email"} element={<VerifyEmail />} />
+            {/* <Route path={"/verify-email"} element={<VerifyEmail />} /> */}
           </>
         )}
 
@@ -75,22 +75,19 @@ export default function App() {
           <Route path={"/share/p/:pageSlug"} element={<SharedPage />} />
         </Route>
 
-        <Route path={"/pdf-render/:pageId"} element={<PdfRenderPage />} />
+        {/* <Route path={"/pdf-render/:pageId"} element={<PdfRenderPage />} /> */}
         <Route path={"/share/:shareId"} element={<ShareRedirect />} />
         <Route path={"/p/:pageSlug"} element={<PageRedirect />} />
 
         <Route element={<Layout />}>
           <Route path={"/home"} element={<Home />} />
-          <Route path={"/ai"} element={<AiChat />} />
-          <Route path={"/ai/chat/:chatId"} element={<AiChat />} />
+          {/* <Route path={"/ai"} element={<AiChat />} /> */}
+          {/* <Route path={"/ai/chat/:chatId"} element={<AiChat />} */ }
           <Route path={"/spaces"} element={<SpacesPage />} />
-          <Route path={"/favorites"} element={<FavoritesPage />} />
-          <Route path={"/labels/:labelName"} element={<LabelPage />} />
-          <Route path={"/templates"} element={<TemplateList />} />
-          <Route
-            path={"/templates/:templateId"}
-            element={<TemplateEditor />}
-          />
+          {/* <Route path={"/favorites"} element={<FavoritesPage />} /> */}
+          {/* <Route path={"/labels/:labelName"} element={<LabelPage />} /> */}
+          {/* <Route path={"/templates"} element={<TemplateList />} /> */}
+          {/* <Route path={"/templates/:templateId"} element={<TemplateEditor />} /> */}
           <Route path={"/s/:spaceSlug"} element={<SpaceHome />} />
           <Route path={"/s/:spaceSlug/trash"} element={<SpaceTrash />} />
           <Route
@@ -115,8 +112,8 @@ export default function App() {
             <Route path={"security"} element={<Security />} />
             <Route path={"ai"} element={<AiSettings />} />
             <Route path={"ai/mcp"} element={<AiSettings />} />
-            <Route path={"audit"} element={<AuditLogs />} />
-            <Route path={"verifications"} element={<VerifiedPages />} />
+            {/* <Route path={"audit"} element={<AuditLogs />} /> */}
+            {/* <Route path={"verifications"} element={<VerifiedPages />} /> */}
             {!isCloud() && <Route path={"license"} element={<License />} />}
             {isCloud() && <Route path={"billing"} element={<Billing />} />}
           </Route>

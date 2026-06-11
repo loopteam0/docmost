@@ -7,7 +7,7 @@ import {
 import useUserRole from "@/hooks/use-user-role";
 import { formatMemberCount } from "@/lib";
 import { getSpaceUrl } from "@/lib/config.ts";
-import { Button, Card, Group, rem, SimpleGrid, Text } from "@mantine/core";
+import { Button, Card, Group, rem, SimpleGrid, Text, Title } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -29,11 +29,6 @@ export default function SpaceGrid() {
       className={classes.card}
       withBorder
     >
-      <Card.Section className={classes.cardSection} h={40}>
-        <div className={classes.starButton} data-favorited={spaceFavoriteIds.has(space.id)}>
-          <StarButton type="space" spaceId={space.id} name={space.name} size={16} />
-        </div>
-      </Card.Section>
       <CustomAvatar
         name={space.name}
         avatarUrl={space.logo}
@@ -59,7 +54,7 @@ export default function SpaceGrid() {
       <Group justify="space-between" align="center" mb="md">
         <Title order={2} size="h6" fw={500}>
           {t("Spaces you belong to")}
-        </Text>
+        </Title>
         {isAdmin && ( <CreateSpaceModal />)}
       </Group>
 

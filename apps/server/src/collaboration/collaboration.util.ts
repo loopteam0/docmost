@@ -24,9 +24,6 @@ import {
   CustomTable,
   TiptapImage,
   TiptapVideo,
-  TiptapAudio,
-  TiptapPdf,
-  PageBreak,
   TrailingNode,
   Attachment,
   Drawio,
@@ -35,15 +32,9 @@ import {
   Mention,
   Subpages,
   Highlight,
-  Indent,
   UniqueID,
-  Columns,
-  Column,
-  Status,
   addUniqueIdsToDoc,
   htmlToMarkdown,
-  TransclusionSource,
-  TransclusionReference,
 } from '@docmost/editor-ext';
 import { generateText, getSchema, JSONContent } from '@tiptap/core';
 import { generateHTML, generateJSON } from '../common/helpers/prosemirror/html';
@@ -64,11 +55,10 @@ export const tiptapExtensions = [
   }),
   Heading,
   UniqueID.configure({
-    types: ['heading', 'paragraph', 'transclusionSource'],
+    types: ['heading', 'paragraph'],
   }),
   Comment,
   TextAlign.configure({ types: ['heading', 'paragraph'] }),
-  Indent,
   TaskList,
   TaskItem.configure({
     nested: true,
@@ -93,9 +83,6 @@ export const tiptapExtensions = [
   Youtube,
   TiptapImage,
   TiptapVideo,
-  TiptapAudio,
-  TiptapPdf,
-  PageBreak,
   Callout,
   Attachment,
   CustomCodeBlock,
@@ -104,11 +91,6 @@ export const tiptapExtensions = [
   Embed,
   Mention,
   Subpages,
-  Columns,
-  Column,
-  Status,
-  TransclusionSource,
-  TransclusionReference,
 ] as any;
 
 export function jsonToHtml(tiptapJson: any) {

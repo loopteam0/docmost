@@ -33,7 +33,6 @@ import {
   TiptapImage,
   Callout,
   TiptapVideo,
-  TiptapAudio,
   LinkExtension,
   Selection,
   Attachment,
@@ -41,8 +40,6 @@ import {
   Drawio,
   Excalidraw,
   Embed,
-  TiptapPdf,
-  PageBreak,
   SearchAndReplace,
   Mention,
   TableDndExtension,
@@ -52,14 +49,8 @@ import {
   Subpages,
   Heading,
   Highlight,
-  Indent,
   UniqueID,
   SharedStorage,
-  Columns,
-  Column,
-  Status,
-  TransclusionSource,
-  TransclusionReference,
   TableView,
 } from "@docmost/editor-ext";
 import {
@@ -210,7 +201,6 @@ export const mainExtensions = [
     showOnlyWhenEditable: true,
   }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
-  Indent,
   TaskList,
   TaskItem.configure({
     nested: true,
@@ -316,9 +306,6 @@ export const mainExtensions = [
       className: buildResizeClasses("node-video"),
     },
   }),
-  TiptapAudio.configure({
-    view: AudioView,
-  }),
   Callout.configure({
     view: CalloutView,
   }),
@@ -365,21 +352,8 @@ export const mainExtensions = [
   Embed.configure({
     view: EmbedView,
   }),
-  TiptapPdf.configure({
-    view: PdfView,
-  }),
-  PageBreak,
   Subpages.configure({
     view: SubpagesView,
-  }),
-  Status.configure({
-    view: StatusView,
-  }),
-  TransclusionSource.configure({
-    view: TransclusionView,
-  }),
-  TransclusionReference.configure({
-    view: TransclusionReferenceView,
   }),
   MarkdownClipboard.configure({
     transformPastedText: true,
@@ -404,8 +378,6 @@ export const mainExtensions = [
       };
     },
   }).configure(),
-  Columns,
-  Column,
   AutoJoiner.configure({
     elementsToJoin: [],
   }),

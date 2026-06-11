@@ -32,6 +32,7 @@ export interface ISpace {
   spaceId?: string;
   membership?: IMembership;
   initialPageSlugId?: string;
+  settings?: ISpaceSettings;
 }
 
 interface IMembership {
