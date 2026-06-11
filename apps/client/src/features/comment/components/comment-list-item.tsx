@@ -1,13 +1,14 @@
 import { Group, Text, Box, Badge } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classes from "./comment.module.css";
 import { useAtom, useAtomValue } from "jotai";
-import { timeAgo } from "@/lib/time";
+import { useTimeAgo } from "@/hooks/use-time-ago";
 import CommentEditor from "@/features/comment/components/comment-editor";
 import { pageEditorAtom } from "@/features/editor/atoms/editor-atoms";
 import CommentActions from "@/features/comment/components/comment-actions";
 import CommentMenu from "@/features/comment/components/comment-menu";
-import { useIsCloudEE } from "@/hooks/use-is-cloud-ee";
+import { useHasFeature } from "@/ee/hooks/use-feature";
+import { Feature } from "@/ee/features";
 import ResolveComment from "@/ee/comment/components/resolve-comment";
 import { useHover } from "@mantine/hooks";
 import {
@@ -18,7 +19,6 @@ import { useResolveCommentMutation } from "@/ee/comment/queries/comment-query";
 import { IComment } from "@/features/comment/types/comment.types";
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import { currentUserAtom } from "@/features/user/atoms/current-user-atom.ts";
-import { useQueryEmit } from "@/features/websocket/use-query-emit";
 import { useTranslation } from "react-i18next";
 
 interface CommentListItemProps {
@@ -40,12 +40,13 @@ function CommentListItem({
   const [isLoading, setIsLoading] = useState(false);
   const editor = useAtomValue(pageEditorAtom);
   const [content, setContent] = useState<string>(comment.content);
+  const editContentRef = useRef<any>(null);
   const updateCommentMutation = useUpdateCommentMutation();
   const deleteCommentMutation = useDeleteCommentMutation(comment.pageId);
   const resolveCommentMutation = useResolveCommentMutation();
   const [currentUser] = useAtom(currentUserAtom);
-  const emit = useQueryEmit();
-  const isCloudEE = useIsCloudEE();
+  const canResolve = useHasFeature(Feature.COMMENT_RESOLUTION);
+  const createdAtAgo = useTimeAgo(comment.createdAt);
 
   useEffect(() => {
     setContent(comment.content);
@@ -56,15 +57,14 @@ function CommentListItem({
       setIsLoading(true);
       const commentToUpdate = {
         commentId: comment.id,
-        content: JSON.stringify(content),
+        content: JSON.stringify(editContentRef.current ?? content),
       };
       await updateCommentMutation.mutateAsync(commentToUpdate);
+      if (editContentRef.current) {
+        setContent(editContentRef.current);
+        editContentRef.current = null;
+      }
       setIsEditing(false);
-
-      emit({
-        operation: "invalidateComment",
-        pageId: pageId,
-      });
     } catch (error) {
       console.error("Failed to update comment:", error);
     } finally {
@@ -76,18 +76,13 @@ function CommentListItem({
     try {
       await deleteCommentMutation.mutateAsync(comment.id);
       editor?.commands.unsetComment(comment.id);
-
-      emit({
-        operation: "invalidateComment",
-        pageId: pageId,
-      });
     } catch (error) {
       console.error("Failed to delete comment:", error);
     }
   }
 
   async function handleResolveComment() {
-    if (!isCloudEE) return;
+    if (!canResolve) return;
     
     try {
       const isResolved = comment.resolvedAt != null;
@@ -101,11 +96,6 @@ function CommentListItem({
       if (editor) {
         editor.commands.setCommentResolved(comment.id, !isResolved);
       }
-
-      emit({
-        operation: "invalidateComment",
-        pageId: pageId,
-      });
     } catch (error) {
       console.error("Failed to toggle resolved state:", error);
     }
@@ -128,6 +118,7 @@ function CommentListItem({
     setIsEditing(true);
   }
   function cancelEdit() {
+    editContentRef.current = null;
     setIsEditing(false);
   }
 
@@ -147,7 +138,7 @@ function CommentListItem({
             </Text>
 
             <div style={{ visibility: hovered ? "visible" : "hidden" }}>
-              {!comment.parentCommentId && canComment && isCloudEE && (
+              {!comment.parentCommentId && canComment && canResolve && (
                 <ResolveComment
                   editor={editor}
                   commentId={comment.id}
@@ -171,7 +162,7 @@ function CommentListItem({
 
           <Group gap="xs">
             <Text size="xs" fw={500} c="dimmed">
-              {timeAgo(comment.createdAt)}
+              {createdAtAgo}
             </Text>
           </Group>
         </div>
@@ -182,6 +173,15 @@ function CommentListItem({
           <Box
             className={classes.textSelection}
             onClick={() => handleCommentClick(comment)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleCommentClick(comment);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={t("Jump to comment selection")}
           >
             <Text size="sm">{comment?.selection}</Text>
           </Box>
@@ -194,7 +194,7 @@ function CommentListItem({
             <CommentEditor
               defaultContent={content}
               editable={true}
-              onUpdate={(newContent: any) => setContent(newContent)}
+              onUpdate={(newContent: any) => { editContentRef.current = newContent; }}
               onSave={handleUpdateComment}
               autofocus={true}
             />

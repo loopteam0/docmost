@@ -29,7 +29,11 @@ export default function SpaceGrid() {
       className={classes.card}
       withBorder
     >
-      <Card.Section className={classes.cardSection} h={40}></Card.Section>
+      <Card.Section className={classes.cardSection} h={40}>
+        <div className={classes.starButton} data-favorited={spaceFavoriteIds.has(space.id)}>
+          <StarButton type="space" spaceId={space.id} name={space.name} size={16} />
+        </div>
+      </Card.Section>
       <CustomAvatar
         name={space.name}
         avatarUrl={space.logo}
@@ -53,7 +57,7 @@ export default function SpaceGrid() {
   return (
     <>
       <Group justify="space-between" align="center" mb="md">
-        <Text fz="sm" fw={500}>
+        <Title order={2} size="h6" fw={500}>
           {t("Spaces you belong to")}
         </Text>
         {isAdmin && ( <CreateSpaceModal />)}
@@ -61,7 +65,7 @@ export default function SpaceGrid() {
 
       <SimpleGrid cols={{ base: 1, xs: 2, sm: 3 }}>{cards}</SimpleGrid>
 
-      {data?.items && data.items.length > 9 && (
+      {data?.items && data.items.length > 6 && (
         <Group justify="flex-end" mt="lg">
           <Button
             component={Link}

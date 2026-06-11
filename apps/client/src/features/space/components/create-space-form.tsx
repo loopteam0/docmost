@@ -101,7 +101,7 @@ export function CreateSpaceForm({ onClose }: Props) {
     useSpaceTemplatesQuery();
 
   const form = useForm<FormValues>({
-    validate: zodResolver(formSchema),
+    validate: zod4Resolver(formSchema),
     validateInputOnChange: ["slug"],
     initialValues: {
       name: "",
@@ -165,6 +165,8 @@ export function CreateSpaceForm({ onClose }: Props) {
               label={t("Space name")}
               placeholder={t("e.g Product Team")}
               variant="filled"
+              data-autofocus
+              errorProps={{ role: "alert" }}
               {...form.getInputProps("name")}
             />
 
@@ -173,6 +175,7 @@ export function CreateSpaceForm({ onClose }: Props) {
               label={t("Space slug")}
               placeholder={t("e.g product")}
               variant="filled"
+              errorProps={{ role: "alert" }}
               {...form.getInputProps("slug")}
             />
 
