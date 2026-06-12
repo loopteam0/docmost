@@ -1,5 +1,7 @@
 export * from "./lib/attachment";
+export * from "./lib/audio";
 export * from "./lib/callout";
+export * from "./lib/columns";
 export * from "./lib/comment/comment";
 export * from "./lib/custom-code-block";
 export * from "./lib/details";
@@ -10,20 +12,25 @@ export * from "./lib/excalidraw";
 export * from "./lib/heading/heading";
 export * from "./lib/highlight";
 export * from "./lib/image";
+export * from "./lib/indent";
 export * from "./lib/link";
 export * from "./lib/markdown";
 export * from "./lib/math";
 export * from "./lib/media-utils";
 export * from "./lib/mention";
+export * from "./lib/page-break";
+export * from "./lib/pdf";
 export * from "./lib/recreate-transform";
+export * from "./lib/resizable-nodeview";
 export * from "./lib/search-and-replace";
 export * from "./lib/selection";
 export * from "./lib/shared-storage";
+export * from "./lib/status";
 export * from "./lib/subpages";
 export * from "./lib/table";
 export * from "./lib/trailing-node";
+export * from "./lib/transclusion";
 export * from "./lib/unique-id";
 export * from "./lib/utils";
 export * from "./lib/video";
-
 

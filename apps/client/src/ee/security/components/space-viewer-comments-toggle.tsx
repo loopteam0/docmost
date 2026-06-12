@@ -1,11 +1,11 @@
-import { Group, Text, Switch, Tooltip } from "@mantine/core";
+import { Feature } from "@/ee/features.ts";
+import { useHasFeature } from "@/ee/hooks/use-feature.ts";
+import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label.ts";
+import { useUpdateSpaceMutation } from "@/features/space/queries/space-query.ts";
+import { ISpace } from "@/features/space/types/space.types.ts";
+import { Group, Switch, Text, Tooltip } from "@mantine/core";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ISpace } from "@/features/space/types/space.types.ts";
-import { useUpdateSpaceMutation } from "@/features/space/queries/space-query.ts";
-import { useHasFeature } from "@/ee/hooks/use-feature.ts";
-import { Feature } from "@/ee/features.ts";
-import { useUpgradeLabel } from "@/ee/hooks/use-upgrade-label.ts";
 
 type SpaceViewerCommentsToggleProps = {
   space: ISpace;
@@ -28,7 +28,6 @@ export default function SpaceViewerCommentsToggle({
     try {
       await updateSpaceMutation.mutateAsync({
         spaceId: space.id,
-        allowViewerComments: value,
       });
       setChecked(value);
     } catch {

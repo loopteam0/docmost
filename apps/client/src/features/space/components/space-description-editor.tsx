@@ -1,6 +1,18 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { BaseEditor } from "@/features/editor/base-editor";
+import { EditorContent, useEditor } from "@tiptap/react";
+import { Document } from "@tiptap/extension-document";
+import { Paragraph } from "@tiptap/extension-paragraph";
+import { Text } from "@tiptap/extension-text";
+import { Bold } from "@tiptap/extension-bold";
+import { Italic } from "@tiptap/extension-italic";
+import { Strike } from "@tiptap/extension-strike";
+import { Link } from "@tiptap/extension-link";
+import { BulletList } from "@tiptap/extension-bullet-list";
+import { OrderedList } from "@tiptap/extension-ordered-list";
+import { ListItem } from "@tiptap/extension-list-item";
+import { Placeholder } from "@tiptap/extension-placeholder";
+import { History } from "@tiptap/extension-history";
 import {
   textToTiptapJSON,
   tiptapJSONToText,
@@ -19,8 +31,8 @@ interface SpaceDescriptionEditorProps {
 /**
  * Space Description Editor - A simple rich text editor for space descriptions
  *
- * Uses BaseEditor with "basic" preset for essential formatting (bold, italic, lists, links)
- * without complex features like collaboration, comments, or file uploads.
+ * Provides essential formatting (bold, italic, lists, links) without complex
+ * features like collaboration, comments, or file uploads.
  *
  * Supports both plain text (for form integration) and TipTap JSON formats.
  *
@@ -52,13 +64,16 @@ export const SpaceDescriptionEditor: React.FC<SpaceDescriptionEditorProps> = ({
     if (value !== undefined) {
       return textToTiptapJSON(value);
     }
+    if (typeof initialContent === "string") {
+      return textToTiptapJSON(initialContent);
+    }
     return initialContent;
   }, [value, initialContent]);
 
   // Debounced save handler (auto-save after 2 seconds of inactivity)
-  const debouncedSave = useDebouncedCallback((content: any) => {
+  const debouncedSave = useDebouncedCallback((newContent: any) => {
     if (onSave) {
-      onSave(content);
+      onSave(newContent);
     }
   }, 2000);
 
@@ -72,30 +87,50 @@ export const SpaceDescriptionEditor: React.FC<SpaceDescriptionEditorProps> = ({
     }
   };
 
+  const editor = useEditor(
+    {
+      extensions: [
+        Document,
+        Paragraph,
+        Text,
+        Bold,
+        Italic,
+        Strike,
+        Link.configure({ openOnClick: false }),
+        BulletList,
+        OrderedList,
+        ListItem,
+        History,
+        Placeholder.configure({
+          placeholder,
+          showOnlyWhenEditable: true,
+        }),
+      ],
+      content: content,
+      editable,
+      immediatelyRender: true,
+      shouldRerenderOnTransaction: false,
+      onUpdate({ editor }) {
+        handleUpdate(editor.getJSON());
+      },
+    },
+    [spaceId],
+  );
+
+  useEffect(() => {
+    if (editor && editor.isEditable !== editable) {
+      editor.setEditable(editable);
+    }
+  }, [editor, editable]);
+
+  if (!editor) {
+    return null;
+  }
+
   return (
-    <BaseEditor
-      preset="basic"
-      defaultContent={content}
-      editable={editable}
-      placeholder={placeholder}
-      // No collaboration needed for space descriptions
-      collaboration={false}
-      // No comments needed
-      comments={false}
-      // No file uploads needed (can enable if needed)
-      uploads={false}
-      // Enable basic menus
-      menus={{
-        bubble: true, // Text formatting menu
-        link: true, // Link menu
-      }}
-      // Disable search & replace (not needed for short descriptions)
-      searchReplace={false}
-      // Handle updates
-      onUpdate={handleUpdate}
-      // Styling
-      className="space-description-editor"
-    />
+    <div className="space-description-editor">
+      <EditorContent editor={editor} />
+    </div>
   );
 };
 

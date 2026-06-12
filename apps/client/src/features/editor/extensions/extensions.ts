@@ -1,109 +1,118 @@
-import { markInputRule } from "@tiptap/core";
-import { StarterKit } from "@tiptap/starter-kit";
-import { Code } from "@tiptap/extension-code";
-import { TextAlign } from "@tiptap/extension-text-align";
-import { TaskList, TaskItem } from "@tiptap/extension-list";
-import { Placeholder, CharacterCount, UndoRedo } from "@tiptap/extensions";
-import { Superscript } from "@tiptap/extension-superscript";
-import SubScript from "@tiptap/extension-subscript";
-import { Typography } from "@tiptap/extension-typography";
-import { TextStyle } from "@tiptap/extension-text-style";
-import { Color } from "@tiptap/extension-color";
-import { Youtube } from "@tiptap/extension-youtube";
+import AttachmentView from "@/features/editor/components/attachment/attachment-view.tsx";
+import AudioView from "@/features/editor/components/audio/audio-view.tsx";
+import CalloutView from "@/features/editor/components/callout/callout-view.tsx";
+import CodeBlockView from "@/features/editor/components/code-block/code-block-view.tsx";
+import {
+  buildResizeClasses,
+  createResizeHandle,
+} from "@/features/editor/components/common/node-resize-handles.ts";
+import EmbedView from "@/features/editor/components/embed/embed-view.tsx";
+import ExcalidrawView from "@/features/editor/components/excalidraw/excalidraw-view-lazy.tsx";
+import {
+  createImageHandle,
+  imageResizeClasses,
+} from "@/features/editor/components/image/image-resize-handles.ts";
+import ImageView from "@/features/editor/components/image/image-view.tsx";
+import LinkView from "@/features/editor/components/link/link-view.tsx";
+import MathBlockView from "@/features/editor/components/math/math-block.tsx";
+import MathInlineView from "@/features/editor/components/math/math-inline.tsx";
+import mentionRenderItems from "@/features/editor/components/mention/mention-suggestion.ts";
+import MentionView from "@/features/editor/components/mention/mention-view.tsx";
+import PdfView from "@/features/editor/components/pdf/pdf-view.tsx";
+import getSuggestionItems from "@/features/editor/components/slash-menu/menu-items";
+import renderItems from "@/features/editor/components/slash-menu/render-items";
+import StatusView from "@/features/editor/components/status/status-view.tsx";
+import SubpagesView from "@/features/editor/components/subpages/subpages-view.tsx";
+import TransclusionReferenceView from "@/features/editor/components/transclusion/transclusion-reference-view.tsx";
+import TransclusionView from "@/features/editor/components/transclusion/transclusion-view.tsx";
+import VideoView from "@/features/editor/components/video/video-view.tsx";
+import AutoJoiner from "@/features/editor/extensions/autojoiner.ts";
+import { CleanStyles } from "@/features/editor/extensions/clean-styles.ts";
+import GlobalDragHandle from "@/features/editor/extensions/drag-handle.ts";
+import { MarkdownClipboard } from "@/features/editor/extensions/markdown-clipboard.ts";
 import SlashCommand, {
   SlashCommandExtension as Command,
 } from "@/features/editor/extensions/slash-command";
-import renderItems from "@/features/editor/components/slash-menu/render-items";
-import getSuggestionItems from "@/features/editor/components/slash-menu/menu-items";
-import { Collaboration, isChangeOrigin } from "@tiptap/extension-collaboration";
-import { CollaborationCaret } from "@tiptap/extension-collaboration-caret";
-import { HocuspocusProvider } from "@hocuspocus/provider";
-import {
-  Comment,
-  Details,
-  DetailsContent,
-  DetailsSummary,
-  MathBlock,
-  MathInline,
-  TableCell,
-  TableRow,
-  TableHeader,
-  CustomTable,
-  TrailingNode,
-  TiptapImage,
-  Callout,
-  TiptapVideo,
-  LinkExtension,
-  Selection,
-  Attachment,
-  CustomCodeBlock,
-  Drawio,
-  Excalidraw,
-  Embed,
-  SearchAndReplace,
-  Mention,
-  TableDndExtension,
-  TableHandleCommandsExtension,
-  TableHeaderPin,
-  TableReadonlySort,
-  Subpages,
-  Heading,
-  Highlight,
-  UniqueID,
-  SharedStorage,
-  TableView,
-} from "@docmost/editor-ext";
 import {
   randomElement,
   userColors,
 } from "@/features/editor/extensions/utils.ts";
 import { IUser } from "@/features/user/types/user.types.ts";
+import i18n from "@/i18n.ts";
 import {
-  createImageHandle,
-  imageResizeClasses,
-} from "@/features/editor/components/image/image-resize-handles.ts";
-import {
-  createResizeHandle,
-  buildResizeClasses,
-} from "@/features/editor/components/common/node-resize-handles.ts";
-import MathInlineView from "@/features/editor/components/math/math-inline.tsx";
-import MathBlockView from "@/features/editor/components/math/math-block.tsx";
-import ImageView from "@/features/editor/components/image/image-view.tsx";
-import CalloutView from "@/features/editor/components/callout/callout-view.tsx";
-import StatusView from "@/features/editor/components/status/status-view.tsx";
-import VideoView from "@/features/editor/components/video/video-view.tsx";
-import AudioView from "@/features/editor/components/audio/audio-view.tsx";
-import AttachmentView from "@/features/editor/components/attachment/attachment-view.tsx";
-import CodeBlockView from "@/features/editor/components/code-block/code-block-view.tsx";
-import DrawioView from "../components/drawio/drawio-view";
-import ExcalidrawView from "@/features/editor/components/excalidraw/excalidraw-view-lazy.tsx";
-import EmbedView from "@/features/editor/components/embed/embed-view.tsx";
-import PdfView from "@/features/editor/components/pdf/pdf-view.tsx";
-import SubpagesView from "@/features/editor/components/subpages/subpages-view.tsx";
-import TransclusionView from "@/features/editor/components/transclusion/transclusion-view.tsx";
-import TransclusionReferenceView from "@/features/editor/components/transclusion/transclusion-reference-view.tsx";
-import { common, createLowlight } from "lowlight";
-import plaintext from "highlight.js/lib/languages/plaintext";
-import powershell from "highlight.js/lib/languages/powershell";
-import abap from "highlightjs-sap-abap";
+  Attachment,
+  Callout,
+  Column,
+  Columns,
+  Comment,
+  CustomCodeBlock,
+  CustomTable,
+  Details,
+  DetailsContent,
+  DetailsSummary,
+  Drawio,
+  Embed,
+  Excalidraw,
+  Heading,
+  Highlight,
+  Indent,
+  LinkExtension,
+  MathBlock,
+  MathInline,
+  Mention,
+  PageBreak,
+  SearchAndReplace,
+  Selection,
+  SharedStorage,
+  Status,
+  Subpages,
+  TableCell,
+  TableDndExtension,
+  TableHandleCommandsExtension,
+  TableHeader,
+  TableHeaderPin,
+  TableReadonlySort,
+  TableRow,
+  TableView,
+  TiptapAudio,
+  TiptapImage,
+  TiptapPdf,
+  TiptapVideo,
+  TrailingNode,
+  TransclusionReference,
+  TransclusionSource,
+  UniqueID,
+} from "@docmost/editor-ext";
+import { HocuspocusProvider } from "@hocuspocus/provider";
+import { markInputRule } from "@tiptap/core";
+import { Code } from "@tiptap/extension-code";
+import { Collaboration, isChangeOrigin } from "@tiptap/extension-collaboration";
+import { CollaborationCaret } from "@tiptap/extension-collaboration-caret";
+import { Color } from "@tiptap/extension-color";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
+import SubScript from "@tiptap/extension-subscript";
+import { Superscript } from "@tiptap/extension-superscript";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Typography } from "@tiptap/extension-typography";
+import { Youtube } from "@tiptap/extension-youtube";
+import { CharacterCount, Placeholder, UndoRedo } from "@tiptap/extensions";
+import { ReactMarkViewRenderer, ReactNodeViewRenderer } from "@tiptap/react";
+import { StarterKit } from "@tiptap/starter-kit";
+import { countWords } from "alfaaz";
+import clojure from "highlight.js/lib/languages/clojure";
+import dockerfile from "highlight.js/lib/languages/dockerfile";
 import elixir from "highlight.js/lib/languages/elixir";
 import erlang from "highlight.js/lib/languages/erlang";
-import dockerfile from "highlight.js/lib/languages/dockerfile";
-import clojure from "highlight.js/lib/languages/clojure";
 import fortran from "highlight.js/lib/languages/fortran";
 import haskell from "highlight.js/lib/languages/haskell";
+import plaintext from "highlight.js/lib/languages/plaintext";
+import powershell from "highlight.js/lib/languages/powershell";
 import scala from "highlight.js/lib/languages/scala";
-import mentionRenderItems from "@/features/editor/components/mention/mention-suggestion.ts";
-import { ReactNodeViewRenderer, ReactMarkViewRenderer } from "@tiptap/react";
-import MentionView from "@/features/editor/components/mention/mention-view.tsx";
-import LinkView from "@/features/editor/components/link/link-view.tsx";
-import i18n from "@/i18n.ts";
-import { MarkdownClipboard } from "@/features/editor/extensions/markdown-clipboard.ts";
+import abap from "highlightjs-sap-abap";
+import { common, createLowlight } from "lowlight";
+import DrawioView from "../components/drawio/drawio-view";
 import EmojiCommand from "./emoji-command";
-import { countWords } from "alfaaz";
-import AutoJoiner from "@/features/editor/extensions/autojoiner.ts";
-import GlobalDragHandle from "@/features/editor/extensions/drag-handle.ts";
-import { CleanStyles } from "@/features/editor/extensions/clean-styles.ts";
 
 const lowlight = createLowlight(common);
 lowlight.register("mermaid", plaintext);
@@ -201,6 +210,7 @@ export const mainExtensions = [
     showOnlyWhenEditable: true,
   }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
+  Indent,
   TaskList,
   TaskItem.configure({
     nested: true,
@@ -306,6 +316,9 @@ export const mainExtensions = [
       className: buildResizeClasses("node-video"),
     },
   }),
+  TiptapAudio.configure({
+    view: AudioView,
+  }),
   Callout.configure({
     view: CalloutView,
   }),
@@ -352,8 +365,21 @@ export const mainExtensions = [
   Embed.configure({
     view: EmbedView,
   }),
+  TiptapPdf.configure({
+    view: PdfView,
+  }),
+  PageBreak,
   Subpages.configure({
     view: SubpagesView,
+  }),
+  Status.configure({
+    view: StatusView,
+  }),
+  TransclusionSource.configure({
+    view: TransclusionView,
+  }),
+  TransclusionReference.configure({
+    view: TransclusionReferenceView,
   }),
   MarkdownClipboard.configure({
     transformPastedText: true,
@@ -378,6 +404,8 @@ export const mainExtensions = [
       };
     },
   }).configure(),
+  Columns,
+  Column,
   AutoJoiner.configure({
     elementsToJoin: [],
   }),

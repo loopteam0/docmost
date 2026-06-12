@@ -1,50 +1,4 @@
 import {
-  IconBlockquote,
-  IconCaretRightFilled,
-  IconCheckbox,
-  IconCode,
-  IconH1,
-  IconH2,
-  IconH3,
-  IconInfoCircle,
-  IconList,
-  IconListNumbers,
-  IconMath,
-  IconMathFunction,
-  IconMovie,
-  IconMusic,
-  IconPaperclip,
-  IconFileTypePdf,
-  IconPhoto,
-  IconTable,
-  IconTypography,
-  IconMenu4,
-  IconPageBreak,
-  IconCalendar,
-  IconAppWindow,
-  IconSitemap,
-  IconColumns3,
-  IconColumns2,
-  IconTag,
-  IconMoodSmile,
-  IconRotate2,
-} from "@tabler/icons-react";
-import {
-  CommandProps,
-  SlashMenuGroupedItemsType,
-} from "@/features/editor/components/slash-menu/types";
-import { uploadImageAction } from "@/features/editor/components/image/upload-image-action.tsx";
-import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
-import { uploadAudioAction } from "@/features/editor/components/audio/upload-audio-action.tsx";
-import { uploadAttachmentAction } from "@/features/editor/components/attachment/upload-attachment-action.tsx";
-import { uploadPdfAction } from "@/features/editor/components/pdf/upload-pdf-action.tsx";
-import IconExcalidraw from "@/components/icons/icon-excalidraw";
-import IconMermaid from "@/components/icons/icon-mermaid";
-import IconDrawio from "@/components/icons/icon-drawio";
-import { IconColumns4 } from "@/components/icons/icon-columns-4";
-import { IconColumns5 } from "@/components/icons/icon-columns-5";
-import i18n from "@/i18n.ts";
-import {
   AirtableIcon,
   FigmaIcon,
   FramerIcon,
@@ -56,6 +10,52 @@ import {
   VimeoIcon,
   YoutubeIcon,
 } from "@/components/icons";
+import { IconColumns4 } from "@/components/icons/icon-columns-4";
+import { IconColumns5 } from "@/components/icons/icon-columns-5";
+import IconDrawio from "@/components/icons/icon-drawio";
+import IconExcalidraw from "@/components/icons/icon-excalidraw";
+import IconMermaid from "@/components/icons/icon-mermaid";
+import { uploadAttachmentAction } from "@/features/editor/components/attachment/upload-attachment-action.tsx";
+import { uploadAudioAction } from "@/features/editor/components/audio/upload-audio-action.tsx";
+import { uploadImageAction } from "@/features/editor/components/image/upload-image-action.tsx";
+import { uploadPdfAction } from "@/features/editor/components/pdf/upload-pdf-action.tsx";
+import {
+  CommandProps,
+  SlashMenuGroupedItemsType,
+} from "@/features/editor/components/slash-menu/types";
+import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
+import i18n from "@/i18n.ts";
+import {
+  IconAppWindow,
+  IconBlockquote,
+  IconCalendar,
+  IconCaretRightFilled,
+  IconCheckbox,
+  IconCode,
+  IconColumns2,
+  IconColumns3,
+  IconFileTypePdf,
+  IconH1,
+  IconH2,
+  IconH3,
+  IconInfoCircle,
+  IconList,
+  IconListNumbers,
+  IconMath,
+  IconMathFunction,
+  IconMenu4,
+  IconMoodSmile,
+  IconMovie,
+  IconMusic,
+  IconPageBreak,
+  IconPaperclip,
+  IconPhoto,
+  IconRotate2,
+  IconSitemap,
+  IconTable,
+  IconTag,
+  IconTypography,
+} from "@tabler/icons-react";
 
 const CommandGroups: SlashMenuGroupedItemsType = {
   basic: [

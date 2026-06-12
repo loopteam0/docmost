@@ -1,5 +1,7 @@
 import { CustomAvatar } from "@/components/ui/custom-avatar.tsx";
 import { AvatarIconType } from "@/features/attachments/types/attachment.types.ts";
+import StarButton from "@/features/favorite/components/star-button";
+import { useFavoriteIds } from "@/features/favorite/queries/favorite-query";
 import {
   prefetchSpace,
   useGetSpacesQuery,
@@ -18,6 +20,8 @@ export default function SpaceGrid() {
   const { t } = useTranslation();
   const { data, isLoading } = useGetSpacesQuery({ limit: 10 });
   const {isAdmin} = useUserRole();
+  const spaceFavoriteIds = useFavoriteIds('space');
+
   const cards = data?.items.slice(0, 9).map((space, index) => (
     <Card
       key={space.id}
@@ -29,6 +33,11 @@ export default function SpaceGrid() {
       className={classes.card}
       withBorder
     >
+      <Card.Section className={classes.cardSection} h={40}>
+        <div className={classes.starButton} data-favorited={spaceFavoriteIds.has(space.id)}>
+          <StarButton type="space" spaceId={space.id} name={space.name} size={16} />
+        </div>
+      </Card.Section>
       <CustomAvatar
         name={space.name}
         avatarUrl={space.logo}

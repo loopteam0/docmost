@@ -1,8 +1,8 @@
+import getSuggestionItems from '@/features/editor/components/slash-menu/menu-items';
+import renderItems from '@/features/editor/components/slash-menu/render-items';
 import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
 import Suggestion, { SuggestionOptions } from '@tiptap/suggestion';
-import renderItems from '@/features/editor/components/slash-menu/render-items';
-import getSuggestionItems from '@/features/editor/components/slash-menu/menu-items';
 
 export const slashMenuPluginKey = new PluginKey('slash-command');
 

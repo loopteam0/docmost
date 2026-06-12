@@ -112,3 +112,5 @@ export const EditorLinkMenu: FC<EditorLinkMenuProps> = ({ editor }) => {
     </BubbleMenu>
   );
 };
+
+export default EditorLinkMenu;
