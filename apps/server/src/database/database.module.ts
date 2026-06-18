@@ -1,10 +1,4 @@
-import {
-  Global,
-  Logger,
-  Module,
-  OnApplicationBootstrap,
-  BeforeApplicationShutdown,
-} from '@nestjs/common';
+import { Global, Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectKysely, KyselyModule } from 'nestjs-kysely';
 import { EnvironmentService } from '../integrations/environment/environment.service';
 import { CamelCasePlugin, LogEvent, sql } from 'kysely';
@@ -15,16 +9,25 @@ import { GroupUserRepo } from '@docmost/db/repos/group/group-user.repo';
 import { SpaceRepo } from '@docmost/db/repos/space/space.repo';
 import { SpaceMemberRepo } from '@docmost/db/repos/space/space-member.repo';
 import { PageRepo } from './repos/page/page.repo';
+import { PagePermissionRepo } from './repos/page/page-permission.repo';
 import { CommentRepo } from './repos/comment/comment.repo';
+import { PageTransclusionsRepo } from './repos/page-transclusions/page-transclusions.repo';
+import { PageTransclusionReferencesRepo } from './repos/page-transclusions/page-transclusion-references.repo';
 import { PageHistoryRepo } from './repos/page/page-history.repo';
 import { AttachmentRepo } from './repos/attachment/attachment.repo';
+import { FavoriteRepo } from './repos/favorite/favorite.repo';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import * as process from 'node:process';
 import { MigrationService } from '@docmost/db/services/migration.service';
 import { UserTokenRepo } from './repos/user-token/user-token.repo';
+import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { SpaceTemplateRepo } from '@docmost/db/repos/space-template/space-template.repo';
+import { TemplateRepo } from '@docmost/db/repos/template/template.repo';
+import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
+import { NotificationRepo } from '@docmost/db/repos/notification/notification.repo';
+import { LabelRepo } from '@docmost/db/repos/label/label.repo';
 import { PageListener } from '@docmost/db/listeners/page.listener';
 import { PostgresJSDialect } from 'kysely-postgres-js';
 import * as postgres from 'postgres';
@@ -75,13 +78,22 @@ import { normalizePostgresUrl } from '../common/helpers';
     SpaceRepo,
     SpaceMemberRepo,
     PageRepo,
+    PagePermissionRepo,
+    PageTransclusionsRepo,
+    PageTransclusionReferencesRepo,
     PageHistoryRepo,
     CommentRepo,
+    FavoriteRepo,
     AttachmentRepo,
     UserTokenRepo,
+    UserSessionRepo,
     BacklinkRepo,
     ShareRepo,
     SpaceTemplateRepo,
+    TemplateRepo,
+    WatcherRepo,
+    NotificationRepo,
+    LabelRepo,
     PageListener,
   ],
   exports: [
@@ -92,18 +104,25 @@ import { normalizePostgresUrl } from '../common/helpers';
     SpaceRepo,
     SpaceMemberRepo,
     PageRepo,
+    PagePermissionRepo,
+    PageTransclusionsRepo,
+    PageTransclusionReferencesRepo,
     PageHistoryRepo,
     CommentRepo,
+    FavoriteRepo,
     AttachmentRepo,
     UserTokenRepo,
+    UserSessionRepo,
     BacklinkRepo,
     ShareRepo,
     SpaceTemplateRepo,
+    TemplateRepo,
+    WatcherRepo,
+    NotificationRepo,
+    LabelRepo,
   ],
 })
-export class DatabaseModule
-  implements OnApplicationBootstrap, BeforeApplicationShutdown
-{
+export class DatabaseModule implements OnApplicationBootstrap {
   private readonly logger = new Logger(DatabaseModule.name);
 
   constructor(
@@ -117,12 +136,6 @@ export class DatabaseModule
 
     if (this.environmentService.getNodeEnv() === 'production') {
       await this.migrationService.migrateToLatest();
-    }
-  }
-
-  async beforeApplicationShutdown(): Promise<void> {
-    if (this.db) {
-      await this.db.destroy();
     }
   }
 

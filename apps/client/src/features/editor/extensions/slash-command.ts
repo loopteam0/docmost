@@ -1,8 +1,8 @@
+import getSuggestionItems from '@/features/editor/components/slash-menu/menu-items';
+import renderItems from '@/features/editor/components/slash-menu/render-items';
 import { Extension } from '@tiptap/core';
 import { PluginKey } from '@tiptap/pm/state';
 import Suggestion, { SuggestionOptions } from '@tiptap/suggestion';
-import renderItems from '@/features/editor/components/slash-menu/render-items';
-import getSuggestionItems from '@/features/editor/components/slash-menu/menu-items';
 
 export const slashMenuPluginKey = new PluginKey('slash-command');
 
@@ -16,6 +16,14 @@ const Command = Extension.create({
         char: '/',
         command: ({ editor, range, props }) => {
           props.command({ editor, range, props });
+        },
+        allow: ({ state, range }) => {
+          const $from = state.doc.resolve(range.from);
+          // Disable slash menu inside code blocks
+          if ($from.parent.type.name === 'codeBlock') {
+            return false;
+          }
+          return true;
         },
       } as Partial<SuggestionOptions>,
     };
@@ -39,4 +47,5 @@ const SlashCommand = Command.configure({
   },
 });
 
+export { Command as SlashCommandExtension };
 export default SlashCommand;

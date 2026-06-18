@@ -33,10 +33,18 @@ import SharedPage from "@/pages/share/shared-page.tsx";
 import SpaceHome from "@/pages/space/space-home.tsx";
 import SpaceTrash from "@/pages/space/space-trash.tsx";
 import SpacesPage from "@/pages/spaces/spaces.tsx";
-import { ErrorBoundary } from "react-error-boundary";
 import { useTranslation } from "react-i18next";
 import { Navigate, Route, Routes } from "react-router-dom";
+import AiChat from "./ee/ai-chat/pages/ai-chat";
+import AuditLogs from "./ee/audit/pages/audit-logs";
+import VerifiedPages from "./ee/page-verification/pages/verified-pages";
+import VerifyEmail from "./ee/pages/verify-email";
+import PdfRenderPage from "./ee/pdf-export/pdf-render-page";
+import TemplateEditor from "./ee/template/pages/template-editor";
+import TemplateList from "./ee/template/pages/template-list";
 import PasswordReset from "./pages/auth/password-reset";
+import FavoritesPage from "./pages/favorites/favorites-page";
+import LabelPage from "./pages/label/label-page";
 import GroupInfo from "./pages/settings/group/group-info";
 
 export default function App() {
@@ -63,6 +71,7 @@ export default function App() {
           <>
             <Route path={"/create"} element={<CreateWorkspace />} />
             <Route path={"/select"} element={<CloudLogin />} />
+            <Route path={"/verify-email"} element={<VerifyEmail />} />
           </>
         )}
 
@@ -74,23 +83,27 @@ export default function App() {
           <Route path={"/share/p/:pageSlug"} element={<SharedPage />} />
         </Route>
 
+        <Route path={"/pdf-render/:pageId"} element={<PdfRenderPage />} />
         <Route path={"/share/:shareId"} element={<ShareRedirect />} />
         <Route path={"/p/:pageSlug"} element={<PageRedirect />} />
 
         <Route element={<Layout />}>
           <Route path={"/home"} element={<Home />} />
+          <Route path={"/ai"} element={<AiChat />} />
+          <Route path={"/ai/chat/:chatId"} element={<AiChat />} />
           <Route path={"/spaces"} element={<SpacesPage />} />
+          <Route path={"/favorites"} element={<FavoritesPage />} />
+          <Route path={"/labels/:labelName"} element={<LabelPage />} />
+          <Route path={"/templates"} element={<TemplateList />} />
+          <Route
+            path={"/templates/:templateId"}
+            element={<TemplateEditor />}
+          />
           <Route path={"/s/:spaceSlug"} element={<SpaceHome />} />
           <Route path={"/s/:spaceSlug/trash"} element={<SpaceTrash />} />
           <Route
             path={"/s/:spaceSlug/p/:pageSlug"}
-            element={
-              <ErrorBoundary
-                fallback={<>{t("Failed to load page. An error occurred.")}</>}
-              >
-                <Page />
-              </ErrorBoundary>
-            }
+            element={<Page />}
           />
 
           <Route path={"/settings"}>
@@ -109,6 +122,9 @@ export default function App() {
             <Route path={"sharing"} element={<Shares />} />
             <Route path={"security"} element={<Security />} />
             <Route path={"ai"} element={<AiSettings />} />
+            <Route path={"ai/mcp"} element={<AiSettings />} />
+            <Route path={"audit"} element={<AuditLogs />} />
+            <Route path={"verifications"} element={<VerifiedPages />} />
             {!isCloud() && <Route path={"license"} element={<License />} />}
             {isCloud() && <Route path={"billing"} element={<Billing />} />}
           </Route>

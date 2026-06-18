@@ -1,37 +1,4 @@
 import {
-  IconBlockquote,
-  IconCaretRightFilled,
-  IconCheckbox,
-  IconCode,
-  IconH1,
-  IconH2,
-  IconH3,
-  IconInfoCircle,
-  IconList,
-  IconListNumbers,
-  IconMath,
-  IconMathFunction,
-  IconMovie,
-  IconPaperclip,
-  IconPhoto,
-  IconTable,
-  IconTypography,
-  IconMenu4,
-  IconCalendar,
-  IconAppWindow,
-  IconSitemap,
-} from "@tabler/icons-react";
-import {
-  CommandProps,
-  SlashMenuGroupedItemsType,
-} from "@/features/editor/components/slash-menu/types";
-import { uploadImageAction } from "@/features/editor/components/image/upload-image-action.tsx";
-import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
-import { uploadAttachmentAction } from "@/features/editor/components/attachment/upload-attachment-action.tsx";
-import IconExcalidraw from "@/components/icons/icon-excalidraw";
-import IconMermaid from "@/components/icons/icon-mermaid";
-import IconDrawio from "@/components/icons/icon-drawio";
-import {
   AirtableIcon,
   FigmaIcon,
   FramerIcon,
@@ -43,6 +10,52 @@ import {
   VimeoIcon,
   YoutubeIcon,
 } from "@/components/icons";
+import { IconColumns4 } from "@/components/icons/icon-columns-4";
+import { IconColumns5 } from "@/components/icons/icon-columns-5";
+import IconDrawio from "@/components/icons/icon-drawio";
+import IconExcalidraw from "@/components/icons/icon-excalidraw";
+import IconMermaid from "@/components/icons/icon-mermaid";
+import { uploadAttachmentAction } from "@/features/editor/components/attachment/upload-attachment-action.tsx";
+import { uploadAudioAction } from "@/features/editor/components/audio/upload-audio-action.tsx";
+import { uploadImageAction } from "@/features/editor/components/image/upload-image-action.tsx";
+import { uploadPdfAction } from "@/features/editor/components/pdf/upload-pdf-action.tsx";
+import {
+  CommandProps,
+  SlashMenuGroupedItemsType,
+} from "@/features/editor/components/slash-menu/types";
+import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
+import i18n from "@/i18n.ts";
+import {
+  IconAppWindow,
+  IconBlockquote,
+  IconCalendar,
+  IconCaretRightFilled,
+  IconCheckbox,
+  IconCode,
+  IconColumns2,
+  IconColumns3,
+  IconFileTypePdf,
+  IconH1,
+  IconH2,
+  IconH3,
+  IconInfoCircle,
+  IconList,
+  IconListNumbers,
+  IconMath,
+  IconMathFunction,
+  IconMenu4,
+  IconMoodSmile,
+  IconMovie,
+  IconMusic,
+  IconPageBreak,
+  IconPaperclip,
+  IconPhoto,
+  IconRotate2,
+  IconSitemap,
+  IconTable,
+  IconTag,
+  IconTypography,
+} from "@tabler/icons-react";
 
 const CommandGroups: SlashMenuGroupedItemsType = {
   basic: [
@@ -123,7 +136,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: "Numbered list",
       description: "Create a list with numbering.",
-      searchTerms: ["numbered", "ordered", "list"],
+      searchTerms: ["numbered", "ordered", "list", "ol"],
       icon: IconListNumbers,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).toggleOrderedList().run();
@@ -154,9 +167,17 @@ const CommandGroups: SlashMenuGroupedItemsType = {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
     },
     {
+      title: "Page break",
+      description: "Insert a page break for printing.",
+      searchTerms: ["page", "break", "pagebreak", "print"],
+      icon: IconPageBreak,
+      command: ({ editor, range }: CommandProps) =>
+        editor.chain().focus().deleteRange(range).setPageBreak().run(),
+    },
+    {
       title: "Image",
       description: "Upload any image from your device.",
-      searchTerms: ["photo", "picture", "media"],
+      searchTerms: ["photo", "picture", "media", "file", "attachment"],
       icon: IconPhoto,
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).run();
@@ -170,6 +191,8 @@ const CommandGroups: SlashMenuGroupedItemsType = {
         input.type = "file";
         input.accept = "image/*";
         input.multiple = true;
+        input.style.display = "none";
+        document.body.appendChild(input);
         input.onchange = async () => {
           if (input.files?.length) {
             for (const file of input.files) {
@@ -179,8 +202,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
             }
           }
 
-          // Reset the input value to allow uploading the same file again if needed
-          input.value = "";
+          input.remove();
         };
         input.click();
       },
@@ -188,7 +210,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: "Video",
       description: "Upload any video from your device.",
-      searchTerms: ["video", "mp4", "media"],
+      searchTerms: ["video", "mp4", "media", "file", "attachment"],
       icon: IconMovie,
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).run();
@@ -202,6 +224,8 @@ const CommandGroups: SlashMenuGroupedItemsType = {
         input.type = "file";
         input.accept = "video/*";
         input.multiple = true;
+        input.style.display = "none";
+        document.body.appendChild(input);
         input.onchange = async () => {
           if (input.files?.length) {
             for (const file of input.files) {
@@ -211,8 +235,79 @@ const CommandGroups: SlashMenuGroupedItemsType = {
             }
           }
 
-          // Reset the input value to allow uploading the same file again if needed
-          input.value = "";
+          input.remove();
+        };
+        input.click();
+      },
+    },
+    {
+      title: "Audio",
+      description: "Upload any audio from your device.",
+      searchTerms: [
+        "audio",
+        "music",
+        "sound",
+        "mp3",
+        "media",
+        "file",
+        "attachment",
+      ],
+      icon: IconMusic,
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).run();
+
+        // @ts-ignore
+        const pageId = editor.storage?.pageId;
+        if (!pageId) return;
+
+        // upload audio
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "audio/*";
+        input.multiple = true;
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.onchange = async () => {
+          if (input.files?.length) {
+            for (const file of input.files) {
+              const pos = editor.view.state.selection.from;
+
+              uploadAudioAction(file, editor, pos, pageId);
+            }
+          }
+
+          input.remove();
+        };
+        input.click();
+      },
+    },
+    {
+      title: "Embed PDF",
+      description: "Upload and embed a PDF file.",
+      searchTerms: ["pdf", "document", "embed"],
+      icon: IconFileTypePdf,
+      command: ({ editor, range }) => {
+        editor.chain().focus().deleteRange(range).run();
+
+        // @ts-ignore
+        const pageId = editor.storage?.pageId;
+        if (!pageId) return;
+
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "application/pdf";
+        input.style.display = "none";
+        document.body.appendChild(input);
+        input.onchange = async () => {
+          if (input.files?.length) {
+            for (const file of input.files) {
+              const pos = editor.view.state.selection.from;
+
+              uploadPdfAction(file, editor, pos, pageId);
+            }
+          }
+
+          input.remove();
         };
         input.click();
       },
@@ -220,7 +315,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: "File attachment",
       description: "Upload any file from your device.",
-      searchTerms: ["file", "attachment", "upload", "pdf", "csv", "zip"],
+      searchTerms: ["file", "attachment", "upload", "csv", "zip"],
       icon: IconPaperclip,
       command: ({ editor, range }) => {
         editor.chain().focus().deleteRange(range).run();
@@ -234,6 +329,8 @@ const CommandGroups: SlashMenuGroupedItemsType = {
         input.type = "file";
         input.accept = "";
         input.multiple = true;
+        input.style.display = "none";
+        document.body.appendChild(input);
         input.onchange = async () => {
           if (input.files?.length) {
             for (const file of input.files) {
@@ -243,8 +340,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
             }
           }
 
-          // Reset the input value to allow uploading the same file again if needed
-          input.value = "";
+          input.remove();
         };
         input.click();
       },
@@ -343,7 +439,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
           .run(),
     },
     {
-      title: "Draw.io (diagrams.net) ",
+      title: "Draw.io (diagrams.net)",
       description: "Insert and design Drawio diagrams",
       searchTerms: ["drawio", "diagrams", "charts", "uml", "whiteboard"],
       icon: IconDrawio,
@@ -351,7 +447,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
         editor.chain().focus().deleteRange(range).setDrawio().run(),
     },
     {
-      title: "Excalidraw diagram",
+      title: "Excalidraw (Whiteboard)",
       description: "Draw and sketch excalidraw diagrams",
       searchTerms: ["diagrams", "draw", "sketch", "whiteboard"],
       icon: IconExcalidraw,
@@ -364,7 +460,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       searchTerms: ["date", "today"],
       icon: IconCalendar,
       command: ({ editor, range }: CommandProps) => {
-        const currentDate = new Date().toLocaleDateString("en-US", {
+        const currentDate = new Date().toLocaleDateString(i18n.language, {
           year: "numeric",
           month: "long",
           day: "numeric",
@@ -379,13 +475,117 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       },
     },
     {
+      title: "Status",
+      description: "Insert inline status badge.",
+      searchTerms: ["status", "badge", "label", "lozenge"],
+      icon: IconTag,
+      command: ({ editor, range }: CommandProps) => {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .setStatus({ text: "", color: "gray" })
+          .run();
+      },
+    },
+    {
+      title: "Emoji",
+      description: "Insert emoji.",
+      searchTerms: ["emoji", "icon", "smiley", "emoticon", "symbol", "reaction"],
+      icon: IconMoodSmile,
+      command: ({ editor, range }: CommandProps) => {
+        editor.chain().focus().deleteRange(range).insertContent(":").run();
+      },
+    },
+    {
       title: "Subpages (Child pages)",
       description: "List all subpages of the current page",
-      searchTerms: ["subpages", "child", "children", "nested", "hierarchy"],
+      searchTerms: [
+        "subpages",
+        "child",
+        "children",
+        "nested",
+        "hierarchy",
+        "toc",
+      ],
       icon: IconSitemap,
       command: ({ editor, range }: CommandProps) => {
         editor.chain().focus().deleteRange(range).insertSubpages().run();
       },
+    },
+    {
+      title: "Synced block",
+      description: "Create a block that stays in sync across pages.",
+      searchTerms: [
+        "sync",
+        "synced",
+        "synced block",
+        "excerpt",
+        "transclusion",
+        "reusable",
+        "snippet",
+      ],
+      icon: IconRotate2,
+      command: ({ editor, range }: CommandProps) => {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertTransclusionSource()
+          .run();
+      },
+    },
+    {
+      title: "2 Columns",
+      description: "Split content into two columns.",
+      searchTerms: ["columns", "layout", "split", "side"],
+      icon: IconColumns2,
+      command: ({ editor, range }: CommandProps) =>
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertColumns({ layout: "two_equal" })
+          .run(),
+    },
+    {
+      title: "3 Columns",
+      description: "Split content into three columns.",
+      searchTerms: ["columns", "layout", "split", "triple"],
+      icon: IconColumns3,
+      command: ({ editor, range }: CommandProps) =>
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertColumns({ layout: "three_equal" })
+          .run(),
+    },
+    {
+      title: "4 Columns",
+      description: "Split content into four columns.",
+      searchTerms: ["columns", "layout", "split"],
+      icon: IconColumns4,
+      command: ({ editor, range }: CommandProps) =>
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertColumns({ layout: "four_equal" })
+          .run(),
+    },
+    {
+      title: "5 Columns",
+      description: "Split content into five columns.",
+      searchTerms: ["columns", "layout", "split"],
+      icon: IconColumns5,
+      command: ({ editor, range }: CommandProps) =>
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertColumns({ layout: "five_equal" })
+          .run(),
     },
     {
       title: "Iframe embed",
@@ -474,7 +674,7 @@ const CommandGroups: SlashMenuGroupedItemsType = {
     {
       title: "YouTube",
       description: "Embed YouTube video",
-      searchTerms: ["youtube", "yt"],
+      searchTerms: ["youtube", "yt", "media", "video"],
       icon: YoutubeIcon,
       command: ({ editor, range }: CommandProps) => {
         editor
@@ -546,8 +746,10 @@ const CommandGroups: SlashMenuGroupedItemsType = {
 
 export const getSuggestionItems = ({
   query,
+  excludeItems,
 }: {
   query: string;
+  excludeItems?: Set<string>;
 }): SlashMenuGroupedItemsType => {
   const search = query.toLowerCase();
   const filteredGroups: SlashMenuGroupedItemsType = {};
@@ -564,6 +766,7 @@ export const getSuggestionItems = ({
 
   for (const [group, items] of Object.entries(CommandGroups)) {
     const filteredItems = items.filter((item) => {
+      if (excludeItems?.has(item.title)) return false;
       return (
         fuzzyMatch(search, item.title) ||
         item.description.toLowerCase().includes(search) ||
@@ -573,7 +776,11 @@ export const getSuggestionItems = ({
     });
 
     if (filteredItems.length) {
-      filteredGroups[group] = filteredItems;
+      filteredGroups[group] = filteredItems.sort((a, b) => {
+        const aTitle = a.title.toLowerCase().includes(search) ? 0 : 1;
+        const bTitle = b.title.toLowerCase().includes(search) ? 0 : 1;
+        return aTitle - bTitle;
+      });
     }
   }
 

@@ -7,9 +7,15 @@ import { CollabWsAdapter } from './adapter/collab-ws.adapter';
 import { IncomingMessage } from 'http';
 import { WebSocket } from 'ws';
 import { TokenModule } from '../core/auth/token.module';
-import { HistoryListener } from './listeners/history.listener';
+import { HistoryProcessor } from './processors/history.processor';
 import { LoggerExtension } from './extensions/logger.extension';
 import { CollaborationHandler } from './collaboration.handler';
+import { CollabHistoryService } from './services/collab-history.service';
+import { WatcherModule } from '../core/watcher/watcher.module';
+import { TransclusionService } from '../core/page/transclusion/transclusion.service';
+import { TransclusionModule } from '../core/page/transclusion/transclusion.module';
+import { StorageModule } from '../integrations/storage/storage.module';
+import { EnvironmentModule } from '../integrations/environment/environment.module';
 
 @Module({
   providers: [
@@ -17,11 +23,20 @@ import { CollaborationHandler } from './collaboration.handler';
     AuthenticationExtension,
     PersistenceExtension,
     LoggerExtension,
-    HistoryListener,
+    HistoryProcessor,
+    CollabHistoryService,
     CollaborationHandler,
+    TransclusionService,
   ],
   exports: [CollaborationGateway],
-  imports: [TokenModule],
+  imports: [
+    TokenModule,
+    WatcherModule,
+    StorageModule.forRootAsync({
+      imports: [EnvironmentModule],
+    }),
+    TransclusionModule,
+  ],
 })
 export class CollaborationModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(CollaborationModule.name);

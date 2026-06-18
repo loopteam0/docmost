@@ -13,7 +13,7 @@ import {
   buildPageUrl,
   buildSharedPageUrl,
 } from "@/features/page/page.utils.ts";
-import { useClipboard } from "@mantine/hooks";
+import { useClipboard } from "@/hooks/use-clipboard";
 import { notifications } from "@mantine/notifications";
 import { useNavigate } from "react-router-dom";
 import { useDeleteShareMutation } from "@/features/share/queries/share-query.ts";
@@ -75,7 +75,7 @@ export default function ShareActionMenu({ share }: Props) {
         arrowPosition="center"
       >
         <Menu.Target>
-          <ActionIcon variant="subtle" c="gray">
+          <ActionIcon variant="subtle" c="gray" aria-label={t("More options")}>
             <IconDots size={20} stroke={2} />
           </ActionIcon>
         </Menu.Target>
