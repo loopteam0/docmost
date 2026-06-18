@@ -35,6 +35,9 @@ import {
   ApiKeys,
   SpaceTemplates,
   SpaceTemplatePages,
+  Watchers,
+  Audit as _Audit,
+  Templates,
 } from './db';
 import { PageEmbeddings } from '@docmost/db/types/embeddings.types';
 

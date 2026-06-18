@@ -644,6 +644,7 @@ export interface DB {
   spaces: Spaces;
   spaceTemplates: SpaceTemplates;
   spaceTemplatePages: SpaceTemplatePages;
+  templates: Templates;
   userMfa: UserMfa;
   users: Users;
   userSessions: UserSessions;

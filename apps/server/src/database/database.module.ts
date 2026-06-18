@@ -24,6 +24,10 @@ import { UserSessionRepo } from '@docmost/db/repos/session/user-session.repo';
 import { BacklinkRepo } from '@docmost/db/repos/backlink/backlink.repo';
 import { ShareRepo } from '@docmost/db/repos/share/share.repo';
 import { SpaceTemplateRepo } from '@docmost/db/repos/space-template/space-template.repo';
+import { TemplateRepo } from '@docmost/db/repos/template/template.repo';
+import { WatcherRepo } from '@docmost/db/repos/watcher/watcher.repo';
+import { NotificationRepo } from '@docmost/db/repos/notification/notification.repo';
+import { LabelRepo } from '@docmost/db/repos/label/label.repo';
 import { PageListener } from '@docmost/db/listeners/page.listener';
 import { PostgresJSDialect } from 'kysely-postgres-js';
 import * as postgres from 'postgres';
@@ -86,6 +90,10 @@ import { normalizePostgresUrl } from '../common/helpers';
     BacklinkRepo,
     ShareRepo,
     SpaceTemplateRepo,
+    TemplateRepo,
+    WatcherRepo,
+    NotificationRepo,
+    LabelRepo,
     PageListener,
   ],
   exports: [
@@ -108,6 +116,10 @@ import { normalizePostgresUrl } from '../common/helpers';
     BacklinkRepo,
     ShareRepo,
     SpaceTemplateRepo,
+    TemplateRepo,
+    WatcherRepo,
+    NotificationRepo,
+    LabelRepo,
   ],
 })
 export class DatabaseModule implements OnApplicationBootstrap {

@@ -20,6 +20,10 @@ import { AuditContextMiddleware } from '../common/middlewares/audit-context.midd
 import { ShareModule } from './share/share.module';
 import { ProvisionModule } from './provision/provision.module';
 import { FavoriteModule } from './favorite/favorite.module';
+import { LabelModule } from './label/label.module';
+import { NotificationModule } from './notification/notification.module';
+import { WatcherModule } from './watcher/watcher.module';
+import { SessionModule } from './session/session.module';
 
 @Module({
   imports: [
@@ -37,6 +41,10 @@ import { FavoriteModule } from './favorite/favorite.module';
     PageAccessModule,
     ShareModule,
     ProvisionModule,
+    LabelModule,
+    NotificationModule,
+    WatcherModule,
+    SessionModule,
   ],
 })
 export class CoreModule implements NestModule {
