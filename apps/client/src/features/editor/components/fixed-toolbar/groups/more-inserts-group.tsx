@@ -2,6 +2,7 @@ import { FC } from "react";
 import type { Editor } from "@tiptap/react";
 import { ActionIcon, Menu, Tooltip } from "@mantine/core";
 import {
+  IconApi,
   IconAppWindow,
   IconCalendar,
   IconCaretRightFilled,
@@ -100,6 +101,14 @@ export const MoreInsertsGroup: FC<Props> = ({ editor, templateMode }) => {
             }
           >
             {t("Synced block")}
+          </Menu.Item>
+        )}
+        {!templateMode && (
+          <Menu.Item
+            leftSection={<IconApi size={16} />}
+            onClick={() => editor.chain().focus().setOpenApi().run()}
+          >
+            {t("OpenAPI / Swagger")}
           </Menu.Item>
         )}
 

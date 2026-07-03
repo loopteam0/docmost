@@ -18,6 +18,7 @@ export * from "./lib/markdown";
 export * from "./lib/math";
 export * from "./lib/media-utils";
 export * from "./lib/mention";
+export * from "./lib/openapi";
 export * from "./lib/page-break";
 export * from "./lib/pdf";
 export * from "./lib/recreate-transform";

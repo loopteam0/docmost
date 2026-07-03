@@ -1,0 +1,41 @@
+:global(.ProseMirror .node-openapi.ProseMirror-selectednode) {
+  outline: none;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.wrapper {
+  @mixin light {
+    background-color: var(--mantine-color-gray-0);
+  }
+
+  @mixin dark {
+    background-color: var(--mantine-color-dark-7);
+  }
+}
+
+.panel {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  border-radius: 8px;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  @mixin light {
+    background-color: var(--mantine-color-white);
+    border-bottom: 1px solid var(--mantine-color-gray-2);
+  }
+
+  @mixin dark {
+    background-color: var(--mantine-color-dark-6);
+    border-bottom: 1px solid var(--mantine-color-dark-4);
+  }
+}
