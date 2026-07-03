@@ -18,6 +18,7 @@ import MathBlockView from "@/features/editor/components/math/math-block.tsx";
 import MathInlineView from "@/features/editor/components/math/math-inline.tsx";
 import mentionRenderItems from "@/features/editor/components/mention/mention-suggestion.ts";
 import MentionView from "@/features/editor/components/mention/mention-view.tsx";
+import OpenApiViewLazy from "@/features/editor/components/openapi/openapi-view-lazy.tsx";
 import PdfView from "@/features/editor/components/pdf/pdf-view.tsx";
 import getSuggestionItems from "@/features/editor/components/slash-menu/menu-items";
 import renderItems from "@/features/editor/components/slash-menu/render-items";
@@ -60,6 +61,7 @@ import {
   MathBlock,
   MathInline,
   Mention,
+  OpenApi,
   PageBreak,
   SearchAndReplace,
   Selection,
@@ -365,6 +367,9 @@ export const mainExtensions = [
   Embed.configure({
     view: EmbedView,
   }),
+  OpenApi.configure({
+    view: OpenApiViewLazy,
+  }),
   TiptapPdf.configure({
     view: PdfView,
   }),
@@ -420,7 +425,8 @@ const TEMPLATE_EXCLUDED_SLASH_ITEMS = new Set([
   "Draw.io (diagrams.net)",
   "Excalidraw (Whiteboard)",
   "Audio",
-  "Synced block"
+  "Synced block",
+  "OpenAPI / Swagger"
 ]);
 
 const TemplateSlashCommand = Command.configure({

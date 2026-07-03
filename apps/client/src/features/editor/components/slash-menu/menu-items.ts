@@ -26,6 +26,7 @@ import {
 import { uploadVideoAction } from "@/features/editor/components/video/upload-video-action.tsx";
 import i18n from "@/i18n.ts";
 import {
+  IconApi,
   IconAppWindow,
   IconBlockquote,
   IconCalendar,
@@ -453,6 +454,14 @@ const CommandGroups: SlashMenuGroupedItemsType = {
       icon: IconExcalidraw,
       command: ({ editor, range }: CommandProps) =>
         editor.chain().focus().deleteRange(range).setExcalidraw().run(),
+    },
+    {
+      title: "OpenAPI / Swagger",
+      description: "Insert interactive API documentation",
+      searchTerms: ["openapi", "swagger", "api", "rest", "docs"],
+      icon: IconApi,
+      command: ({ editor, range }: CommandProps) =>
+        editor.chain().focus().deleteRange(range).setOpenApi().run(),
     },
     {
       title: "Date",

@@ -30,6 +30,7 @@ import {
   Drawio,
   Excalidraw,
   Embed,
+  OpenApi,
   Mention,
   Subpages,
   Highlight,
@@ -91,6 +92,7 @@ export const tiptapExtensions = [
   Drawio,
   Excalidraw,
   Embed,
+  OpenApi,
   Mention,
   Subpages,
 ] as any;

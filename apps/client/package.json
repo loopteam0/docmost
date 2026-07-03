@@ -27,6 +27,7 @@
     "@mantine/modals": "8.3.18",
     "@mantine/notifications": "8.3.18",
     "@mantine/spotlight": "8.3.18",
+    "@scalar/api-reference-react": "^0.9.51",
     "@slidoapp/emoji-mart": "5.8.7",
     "@slidoapp/emoji-mart-data": "1.2.4",
     "@slidoapp/emoji-mart-react": "1.1.5",
